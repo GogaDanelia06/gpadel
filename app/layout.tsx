@@ -34,7 +34,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0f172a",
+  themeColor: "#ffffff",
   width: "device-width",
   initialScale: 1,
 };
@@ -46,7 +46,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ka" className="scroll-smooth">
-      <body className="bg-slate-900 text-white antialiased">
+      <body className="bg-white text-brand-ink antialiased">
         <LanguageProvider>{children}</LanguageProvider>
       </body>
     </html>

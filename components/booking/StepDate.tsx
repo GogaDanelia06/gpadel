@@ -103,25 +103,25 @@ export default function StepDate({
     <div className="space-y-8">
       {/* Date picker */}
       <div>
-        <h3 className="text-white font-semibold text-lg mb-4">{t.book_select_date}</h3>
-        <div className="bg-slate-800/60 border border-slate-700/50 rounded-2xl p-4 sm:p-6">
+        <h3 className="text-brand-ink font-semibold text-lg mb-4">{t.book_select_date}</h3>
+        <div className="bg-white border border-brand-line rounded-2xl shadow-sm p-4 sm:p-6">
           {/* Month nav */}
           <div className="flex items-center justify-between mb-5">
             <button
               onClick={prevMonth}
               disabled={viewDate <= today}
-              className="p-2 rounded-lg hover:bg-slate-700 text-slate-400 hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+              className="p-2 rounded-lg hover:bg-brand-surface text-brand-gray hover:text-brand-ink transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             </button>
-            <h4 className="text-white font-bold text-base">
+            <h4 className="text-brand-ink font-bold text-base">
               {months[viewDate.getMonth()]} {viewDate.getFullYear()}
             </h4>
             <button
               onClick={nextMonth}
-              className="p-2 rounded-lg hover:bg-slate-700 text-slate-400 hover:text-white transition-colors"
+              className="p-2 rounded-lg hover:bg-brand-surface text-brand-gray hover:text-brand-ink transition-colors"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -132,7 +132,7 @@ export default function StepDate({
           {/* Weekday headers */}
           <div className="grid grid-cols-7 gap-1 mb-2">
             {weekdays.map((d) => (
-              <div key={d} className="text-center text-slate-500 text-xs font-medium py-1">
+              <div key={d} className="text-center text-brand-mute text-xs font-medium py-1">
                 {d}
               </div>
             ))}
@@ -154,10 +154,10 @@ export default function StepDate({
                   className={`
                     aspect-square flex items-center justify-center rounded-lg text-sm font-medium transition-all
                     ${!isCurrentMonth ? "opacity-20 cursor-default" : ""}
-                    ${isPast && isCurrentMonth ? "text-slate-600 cursor-not-allowed" : ""}
-                    ${!isPast && isCurrentMonth && !isSel ? "text-slate-300 hover:bg-slate-700 hover:text-white" : ""}
-                    ${isSel ? "bg-green-600 text-white font-bold shadow-lg shadow-green-900/50" : ""}
-                    ${isT && !isSel ? "ring-1 ring-green-500 text-green-400" : ""}
+                    ${isPast && isCurrentMonth ? "text-brand-mute cursor-not-allowed" : ""}
+                    ${!isPast && isCurrentMonth && !isSel ? "text-brand-ink hover:bg-primary-50" : ""}
+                    ${isSel ? "bg-primary-400 text-white font-bold shadow-md" : ""}
+                    ${isT && !isSel ? "ring-1 ring-primary-400 text-primary-500" : ""}
                   `}
                 >
                   {day.getDate()}
@@ -172,20 +172,20 @@ export default function StepDate({
       {selectedDate && (
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-white font-semibold text-lg">{t.book_select_time}</h3>
+            <h3 className="text-brand-ink font-semibold text-lg">{t.book_select_time}</h3>
             <div className="flex items-center gap-4 text-xs">
-              <span className="flex items-center gap-1.5 text-slate-400">
-                <span className="w-3 h-3 rounded-sm bg-green-600" /> {t.book_available}
+              <span className="flex items-center gap-1.5 text-brand-gray">
+                <span className="w-3 h-3 rounded-sm bg-primary-400" /> {t.book_available}
               </span>
-              <span className="flex items-center gap-1.5 text-slate-400">
-                <span className="w-3 h-3 rounded-sm bg-slate-700" /> {t.book_booked}
+              <span className="flex items-center gap-1.5 text-brand-gray">
+                <span className="w-3 h-3 rounded-sm bg-brand-line" /> {t.book_booked}
               </span>
             </div>
           </div>
 
           {loadingSlots ? (
-            <div className="text-center py-8 text-slate-400">
-              <div className="inline-block w-6 h-6 border-2 border-green-600 border-t-transparent rounded-full animate-spin" />
+            <div className="text-center py-8 text-brand-gray">
+              <div className="inline-block w-6 h-6 border-2 border-primary-400 border-t-transparent rounded-full animate-spin" />
             </div>
           ) : (
             <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-2">
@@ -199,9 +199,9 @@ export default function StepDate({
                     disabled={booked}
                     className={`
                       py-2.5 px-3 rounded-lg text-sm font-medium transition-all
-                      ${booked ? "bg-slate-700/50 text-slate-600 cursor-not-allowed" : ""}
-                      ${!booked && !sel ? "bg-slate-800/60 border border-slate-700/50 text-slate-300 hover:border-green-500/50 hover:text-white" : ""}
-                      ${sel ? "bg-green-600 text-white border-transparent shadow-lg shadow-green-900/40" : ""}
+                      ${booked ? "bg-brand-line text-brand-mute line-through cursor-not-allowed" : ""}
+                      ${!booked && !sel ? "bg-white border border-brand-line text-brand-ink hover:border-primary-400 hover:bg-primary-50" : ""}
+                      ${sel ? "bg-primary-400 text-white border border-primary-400 shadow-md" : ""}
                     `}
                   >
                     {slot}
@@ -218,7 +218,7 @@ export default function StepDate({
         <button
           onClick={onNext}
           disabled={!canProceed}
-          className="px-8 py-3 bg-green-600 hover:bg-green-500 disabled:bg-slate-700 disabled:text-slate-500 disabled:cursor-not-allowed text-white font-bold rounded-xl transition-all"
+          className="px-8 py-3 bg-primary-400 hover:bg-primary-500 disabled:bg-brand-line disabled:text-brand-mute disabled:cursor-not-allowed text-white font-bold rounded-xl transition-all"
         >
           {t.book_next}
           <span className="ml-2">→</span>

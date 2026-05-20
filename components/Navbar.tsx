@@ -31,8 +31,8 @@ export default function Navbar({ lang, onLangChange }: NavbarProps) {
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
-          ? "bg-slate-900/95 backdrop-blur-md shadow-lg shadow-black/20"
-          : "bg-transparent"
+          ? "bg-white/90 backdrop-blur-md shadow-sm border-b border-brand-line"
+          : "bg-white/70 backdrop-blur-sm"
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -40,9 +40,9 @@ export default function Navbar({ lang, onLangChange }: NavbarProps) {
           {/* Logo */}
           <Link
             href="/"
-            className="flex items-center gap-2 text-white font-bold text-xl hover:text-green-400 transition-colors"
+            className="flex items-center gap-2 text-brand-ink font-bold text-xl hover:text-primary-400 transition-colors"
           >
-            <span className="w-8 h-8 rounded-full bg-green-600 flex items-center justify-center text-sm font-black">
+            <span className="w-8 h-8 rounded-full bg-primary-400 flex items-center justify-center text-sm font-black text-white">
               G
             </span>
             <span>GPadel</span>
@@ -54,7 +54,7 @@ export default function Navbar({ lang, onLangChange }: NavbarProps) {
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-slate-300 hover:text-white text-sm font-medium transition-colors"
+                className="text-brand-ink hover:text-primary-400 text-sm font-medium transition-colors"
               >
                 {link.label}
               </Link>
@@ -65,19 +65,19 @@ export default function Navbar({ lang, onLangChange }: NavbarProps) {
           <div className="hidden md:flex items-center gap-3">
             <button
               onClick={() => onLangChange(lang === "ka" ? "en" : "ka")}
-              className="flex items-center gap-1 px-3 py-1.5 rounded-full border border-slate-600 text-slate-300 hover:border-green-500 hover:text-green-400 text-sm font-medium transition-all"
+              className="flex items-center gap-1 px-3 py-1.5 rounded-full border border-brand-line text-brand-gray hover:border-primary-400 hover:text-primary-400 text-sm font-medium transition-all"
             >
-              <span className={lang === "ka" ? "text-white font-bold" : "text-slate-500"}>
+              <span className={lang === "ka" ? "text-brand-ink font-bold" : "text-brand-mute"}>
                 GE
               </span>
-              <span className="text-slate-600">|</span>
-              <span className={lang === "en" ? "text-white font-bold" : "text-slate-500"}>
+              <span className="text-brand-mute">|</span>
+              <span className={lang === "en" ? "text-brand-ink font-bold" : "text-brand-mute"}>
                 EN
               </span>
             </button>
             <Link
               href="/book"
-              className="px-4 py-2 bg-green-600 hover:bg-green-500 text-white text-sm font-semibold rounded-lg transition-colors"
+              className="px-4 py-2 bg-primary-400 hover:bg-primary-500 text-white text-sm font-semibold rounded-lg transition-colors"
             >
               {t.nav_book}
             </Link>
@@ -85,23 +85,23 @@ export default function Navbar({ lang, onLangChange }: NavbarProps) {
 
           {/* Mobile menu button */}
           <button
-            className="md:hidden text-white p-2"
+            className="md:hidden text-brand-ink p-2"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label="Toggle menu"
           >
             <div className="w-6 flex flex-col gap-1.5">
               <span
-                className={`block h-0.5 bg-white transition-all ${
+                className={`block h-0.5 bg-brand-ink transition-all ${
                   mobileOpen ? "rotate-45 translate-y-2" : ""
                 }`}
               />
               <span
-                className={`block h-0.5 bg-white transition-all ${
+                className={`block h-0.5 bg-brand-ink transition-all ${
                   mobileOpen ? "opacity-0" : ""
                 }`}
               />
               <span
-                className={`block h-0.5 bg-white transition-all ${
+                className={`block h-0.5 bg-brand-ink transition-all ${
                   mobileOpen ? "-rotate-45 -translate-y-2" : ""
                 }`}
               />
@@ -111,37 +111,37 @@ export default function Navbar({ lang, onLangChange }: NavbarProps) {
 
         {/* Mobile menu */}
         {mobileOpen && (
-          <div className="md:hidden bg-slate-900/98 backdrop-blur-md border-t border-slate-800 py-4 pb-6">
+          <div className="md:hidden bg-white/98 backdrop-blur-md border-t border-brand-line py-4 pb-6">
             <div className="flex flex-col gap-4 px-4">
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="text-slate-300 hover:text-white text-base font-medium transition-colors"
+                  className="text-brand-ink hover:text-primary-400 text-base font-medium transition-colors"
                   onClick={() => setMobileOpen(false)}
                 >
                   {link.label}
                 </Link>
               ))}
-              <div className="flex items-center gap-3 pt-2 border-t border-slate-700">
+              <div className="flex items-center gap-3 pt-2 border-t border-brand-line">
                 <button
                   onClick={() => {
                     onLangChange(lang === "ka" ? "en" : "ka");
                     setMobileOpen(false);
                   }}
-                  className="flex items-center gap-1 px-3 py-1.5 rounded-full border border-slate-600 text-slate-300 hover:border-green-500 hover:text-green-400 text-sm font-medium transition-all"
+                  className="flex items-center gap-1 px-3 py-1.5 rounded-full border border-brand-line text-brand-gray hover:border-primary-400 hover:text-primary-400 text-sm font-medium transition-all"
                 >
-                  <span className={lang === "ka" ? "text-white font-bold" : "text-slate-500"}>
+                  <span className={lang === "ka" ? "text-brand-ink font-bold" : "text-brand-mute"}>
                     GE
                   </span>
-                  <span className="text-slate-600">|</span>
-                  <span className={lang === "en" ? "text-white font-bold" : "text-slate-500"}>
+                  <span className="text-brand-mute">|</span>
+                  <span className={lang === "en" ? "text-brand-ink font-bold" : "text-brand-mute"}>
                     EN
                   </span>
                 </button>
                 <Link
                   href="/book"
-                  className="px-4 py-2 bg-green-600 hover:bg-green-500 text-white text-sm font-semibold rounded-lg transition-colors"
+                  className="px-4 py-2 bg-primary-400 hover:bg-primary-500 text-white text-sm font-semibold rounded-lg transition-colors"
                   onClick={() => setMobileOpen(false)}
                 >
                   {t.nav_book}

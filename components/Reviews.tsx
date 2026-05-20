@@ -35,29 +35,29 @@ const reviews = [
 export default function Reviews({ lang }: ReviewsProps) {
   const t = translations[lang];
   return (
-    <section id="reviews" className="py-24 bg-slate-900">
+    <section id="reviews" className="py-24 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-16">
-          <span className="text-green-500 text-sm font-semibold uppercase tracking-widest">
+          <span className="text-primary-500 text-sm font-semibold uppercase tracking-widest">
             {lang === "ka" ? "Google მიმოხილვები" : "Google Reviews"}
           </span>
-          <h2 className="mt-3 text-3xl sm:text-4xl font-black text-white">{t.reviews_title}</h2>
-          <p className="mt-4 text-slate-400 text-lg">{t.reviews_subtitle}</p>
+          <h2 className="mt-3 text-3xl sm:text-4xl font-black text-brand-ink">{t.reviews_title}</h2>
+          <p className="mt-4 text-brand-gray text-lg">{t.reviews_subtitle}</p>
         </div>
         {/* Review cards */}
         <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
           {reviews.map((review, idx) => (
             <div
               key={idx}
-              className="bg-slate-800/60 border border-slate-700/50 rounded-2xl p-8 hover:border-green-500/30 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-green-900/10"
+              className="bg-white border border-brand-line shadow-md rounded-2xl p-8 hover:border-primary-400 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
             >
               {/* Stars */}
               <div className="flex gap-1 mb-5">
                 {Array.from({ length: 5 }).map((_, i) => (
                   <svg
                     key={i}
-                    className={`w-5 h-5 ${i < review.rating ? "text-yellow-400" : "text-slate-600"}`}
+                    className={`w-5 h-5 ${i < review.rating ? "text-yellow-400" : "text-brand-line"}`}
                     fill="currentColor"
                     viewBox="0 0 20 20"
                   >
@@ -66,24 +66,24 @@ export default function Reviews({ lang }: ReviewsProps) {
                 ))}
               </div>
               {/* Review text */}
-              <blockquote className="text-slate-300 text-base leading-relaxed mb-6">
+              <blockquote className="text-brand-gray text-base leading-relaxed mb-6">
                 &ldquo;{lang === "ka" ? review.textKa : review.textEn}&rdquo;
               </blockquote>
               {/* Reviewer */}
-              <div className="flex items-center gap-4 pt-5 border-t border-slate-700/50">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-green-600 to-green-800 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+              <div className="flex items-center gap-4 pt-5 border-t border-brand-line">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
                   {review.avatar}
                 </div>
                 <div>
-                  <div className="text-white font-semibold">
+                  <div className="text-brand-ink font-semibold">
                     {lang === "ka" ? review.nameKa : review.name}
                   </div>
                   <div className="flex items-center gap-2 mt-0.5">
-                    <span className="text-slate-500 text-sm">
+                    <span className="text-brand-gray text-sm">
                       {lang === "ka" ? review.dateKa : review.dateEn}
                     </span>
-                    <span className="text-slate-700">•</span>
-                    <span className="flex items-center gap-1 text-slate-500 text-sm">
+                    <span className="text-brand-mute">•</span>
+                    <span className="flex items-center gap-1 text-brand-gray text-sm">
                       <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M12.545 10.239v3.821h5.445c-.712 2.315-2.647 3.972-5.445 3.972a6.033 6.033 0 110-12.064c1.498 0 2.866.549 3.921 1.453l2.814-2.814A9.969 9.969 0 0012.545 2C7.021 2 2.543 6.477 2.543 12s4.478 10 10.002 10c8.396 0 10.249-7.85 9.426-11.748l-9.426-.013z" />
                       </svg>
@@ -97,7 +97,7 @@ export default function Reviews({ lang }: ReviewsProps) {
         </div>
         {/* Overall rating */}
         <div className="text-center mt-12">
-          <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-slate-800/60 border border-slate-700/50">
+          <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-brand-surface border border-brand-line">
             <div className="flex gap-1">
               {Array.from({ length: 5 }).map((_, i) => (
                 <svg key={i} className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
@@ -105,8 +105,8 @@ export default function Reviews({ lang }: ReviewsProps) {
                 </svg>
               ))}
             </div>
-            <span className="text-white font-bold text-lg">5.0</span>
-            <span className="text-slate-400 text-sm">
+            <span className="text-brand-ink font-bold text-lg">5.0</span>
+            <span className="text-brand-gray text-sm">
               {lang === "ka" ? "Google-ზე" : "on Google"}
             </span>
           </div>

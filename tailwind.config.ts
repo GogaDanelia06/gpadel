@@ -9,23 +9,31 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        primary: {
-          50: "#f0fdf4",
-          100: "#dcfce7",
-          200: "#bbf7d0",
-          300: "#86efac",
-          400: "#4ade80",
-          500: "#22c55e",
-          600: "#16a34a",
-          700: "#15803d",
-          800: "#166534",
-          900: "#14532d",
+        // GPadel brand palette (matches gpadel.ge Elementor kit)
+        brand: {
+          green: "#61CE70",      // primary accent / CTAs
+          greenDark: "#4FB45E",  // hover state
+          greenLight: "#A8E5B1", // subtle hover backgrounds
+          greenSoft: "#E8F8EC",  // tinted card backgrounds
+          blue: "#6EC1E4",       // secondary accent
+          blueDark: "#4FA9CC",
+          ink: "#54595F",        // primary text / dark gray
+          gray: "#7A7A7A",       // body text
+          mute: "#A7AAAD",       // muted text
+          line: "#E5E5E9",       // borders
+          surface: "#F7F7F8",    // light card surface
         },
-        dark: {
-          900: "#0f172a",
-          800: "#1e293b",
-          700: "#334155",
-          600: "#475569",
+        primary: {
+          50: "#E8F8EC",
+          100: "#D1F1D8",
+          200: "#A8E5B1",
+          300: "#80D88A",
+          400: "#61CE70",   // matches Elementor accent
+          500: "#4FB45E",
+          600: "#3F9A4E",
+          700: "#308040",
+          800: "#236532",
+          900: "#174A24",
         },
       },
       fontFamily: {

@@ -4,6 +4,12 @@
 
 :root {
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --brand-green: #61CE70;
+  --brand-green-dark: #4FB45E;
+  --brand-blue: #6EC1E4;
+  --brand-ink: #54595F;
+  --brand-gray: #7A7A7A;
+  --brand-line: #E5E5E9;
 }
 
 html {
@@ -11,8 +17,8 @@ html {
 }
 
 body {
-  background-color: #0f172a;
-  color: #f8fafc;
+  background-color: #ffffff;
+  color: var(--brand-ink);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -20,17 +26,17 @@ body {
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #1e293b;
+  background: #f7f7f8;
 }
 ::-webkit-scrollbar-thumb {
-  background: #334155;
-  border-radius: 3px;
+  background: #d1d1db;
+  border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #16a34a;
+  background: var(--brand-green);
 }
 
 /* Radial gradient utility */
@@ -40,11 +46,11 @@ body {
 
 /* React Day Picker overrides (if used) */
 .rdp {
-  --rdp-accent-color: #16a34a;
+  --rdp-accent-color: var(--brand-green);
 }
 
 /* Focus styles */
 *:focus-visible {
-  outline: 2px solid #16a34a;
+  outline: 2px solid var(--brand-green);
   outline-offset: 2px;
 }

@@ -46,41 +46,41 @@ export default function About({ lang }: AboutProps) {
   ];
 
   return (
-    <section id="about" className="py-24 bg-slate-900">
+    <section id="about" className="py-24 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           {/* Text */}
           <div>
-            <span className="text-green-500 text-sm font-semibold uppercase tracking-widest">
+            <span className="text-primary-500 text-sm font-semibold uppercase tracking-widest">
               {lang === "ka" ? "ჩვენ შესახებ" : "About Us"}
             </span>
-            <h2 className="mt-3 text-3xl sm:text-4xl font-black text-white leading-tight">
+            <h2 className="mt-3 text-3xl sm:text-4xl font-black text-brand-ink leading-tight">
               {lang === "ka" ? (
                 <>
                   პადელის პირველი{" "}
-                  <span className="text-green-400">პრემიუმ კომპლექსი</span>{" "}
+                  <span className="text-primary-400">პრემიუმ კომპლექსი</span>{" "}
                   წყნეთში
                 </>
               ) : (
                 <>
                   The First{" "}
-                  <span className="text-green-400">Premium Padel Complex</span>{" "}
+                  <span className="text-primary-400">Premium Padel Complex</span>{" "}
                   in Tskneti
                 </>
               )}
             </h2>
-            <p className="mt-6 text-slate-400 text-lg leading-relaxed">{t.about_p1}</p>
-            <p className="mt-4 text-slate-400 text-lg leading-relaxed">{t.about_p2}</p>
+            <p className="mt-6 text-brand-gray text-lg leading-relaxed">{t.about_p1}</p>
+            <p className="mt-4 text-brand-gray text-lg leading-relaxed">{t.about_p2}</p>
 
             {/* Feature grid */}
             <div className="mt-10 grid grid-cols-2 gap-4">
               {features.map((f, i) => (
                 <div
                   key={i}
-                  className="flex items-center gap-3 p-4 rounded-xl bg-slate-800/60 border border-slate-700/50"
+                  className="flex items-center gap-3 p-6 rounded-2xl bg-brand-surface border border-brand-line"
                 >
-                  <div className="text-green-400 flex-shrink-0">{f.icon}</div>
-                  <span className="text-slate-300 text-sm font-medium">{f.label}</span>
+                  <div className="text-primary-400 flex-shrink-0">{f.icon}</div>
+                  <span className="text-brand-ink text-sm font-medium">{f.label}</span>
                 </div>
               ))}
             </div>
@@ -88,7 +88,7 @@ export default function About({ lang }: AboutProps) {
 
           {/* Visual */}
           <div className="relative">
-            <div className="aspect-square rounded-2xl overflow-hidden bg-gradient-to-br from-green-900/50 to-slate-800 border border-slate-700/50 shadow-2xl">
+            <div className="aspect-square rounded-2xl overflow-hidden bg-gradient-to-br from-primary-50 to-brand-surface border border-brand-line shadow-md">
               {/* Court illustration */}
               <div className="w-full h-full flex items-center justify-center p-8">
                 <svg
@@ -130,7 +130,7 @@ export default function About({ lang }: AboutProps) {
             </div>
 
             {/* Floating badge */}
-            <div className="absolute -bottom-4 -right-4 bg-green-600 text-white px-5 py-3 rounded-xl shadow-lg shadow-green-900/50 font-bold">
+            <div className="absolute -bottom-4 -right-4 bg-primary-400 text-white px-5 py-3 rounded-xl shadow-md font-bold">
               <div className="text-2xl">5.0 ★</div>
               <div className="text-xs opacity-80">
                 {lang === "ka" ? "Google Rating" : "Google Rating"}

@@ -41,9 +41,9 @@ export default function BookingWizard({ lang }: BookingWizardProps) {
       <div className="mb-10">
         <div className="flex items-center justify-between relative">
           {/* Track */}
-          <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-0.5 bg-slate-700 z-0" />
+          <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-0.5 bg-brand-line z-0" />
           <div
-            className="absolute left-0 top-1/2 -translate-y-1/2 h-0.5 bg-green-600 z-0 transition-all duration-500"
+            className="absolute left-0 top-1/2 -translate-y-1/2 h-0.5 bg-primary-400 z-0 transition-all duration-500"
             style={{ width: `${((booking.step - 1) / 2) * 100}%` }}
           />
 
@@ -55,9 +55,9 @@ export default function BookingWizard({ lang }: BookingWizardProps) {
                 <div
                   className={`
                     w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all
-                    ${done ? "bg-green-600 text-white" : ""}
-                    ${active ? "bg-green-600 text-white ring-4 ring-green-600/30 scale-110" : ""}
-                    ${!done && !active ? "bg-slate-700 text-slate-400" : ""}
+                    ${done ? "bg-primary-400 text-white" : ""}
+                    ${active ? "bg-primary-400 text-white ring-4 ring-primary-100 scale-110" : ""}
+                    ${!done && !active ? "bg-brand-line text-brand-gray" : ""}
                   `}
                 >
                   {done ? (
@@ -70,7 +70,7 @@ export default function BookingWizard({ lang }: BookingWizardProps) {
                 </div>
                 <span
                   className={`text-xs font-medium text-center max-w-[80px] leading-tight ${
-                    active ? "text-green-400" : done ? "text-slate-300" : "text-slate-500"
+                    active ? "text-primary-500" : done ? "text-brand-ink" : "text-brand-mute"
                   }`}
                 >
                   {step.label}
@@ -82,7 +82,7 @@ export default function BookingWizard({ lang }: BookingWizardProps) {
       </div>
 
       {/* Step panels */}
-      <div className="bg-slate-800/40 border border-slate-700/50 rounded-2xl p-6 sm:p-8">
+      <div className="bg-white border border-brand-line rounded-2xl shadow-sm p-6 sm:p-8">
         {booking.step === 1 && (
           <StepDate
             lang={lang}
