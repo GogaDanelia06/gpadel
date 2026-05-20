@@ -17,6 +17,7 @@ export default function BookingWizard({ lang }: BookingWizardProps) {
     step: 1,
     date: "",
     timeSlots: [],
+    courtId: 1,
     name: "",
     phone: "",
     email: "",
@@ -88,6 +89,10 @@ export default function BookingWizard({ lang }: BookingWizardProps) {
             lang={lang}
             selectedDate={booking.date}
             selectedTimes={booking.timeSlots}
+            selectedCourt={booking.courtId}
+            onCourtChange={(c) =>
+              setBooking((b) => ({ ...b, courtId: c, timeSlots: [] }))
+            }
             onDateChange={(d) =>
               setBooking((b) => ({ ...b, date: d, timeSlots: [] }))
             }
@@ -102,6 +107,7 @@ export default function BookingWizard({ lang }: BookingWizardProps) {
             lang={lang}
             date={booking.date}
             timeSlots={booking.timeSlots}
+            courtId={booking.courtId}
             name={booking.name}
             phone={booking.phone}
             email={booking.email}

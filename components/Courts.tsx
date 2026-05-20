@@ -96,7 +96,7 @@ export default function Courts({ lang }: CourtsProps) {
                 <div className="flex items-center justify-between border-t border-brand-line pt-5">
                   <div>
                     <div className="flex items-baseline gap-1">
-                      <span className="text-3xl font-black text-primary-400">30₾</span>
+                      <span className="text-3xl font-black text-primary-400">20₾</span>
                       <span className="text-brand-gray text-sm">
                         /{lang === "ka" ? "საათი" : "hour"}
                       </span>
@@ -105,7 +105,7 @@ export default function Courts({ lang }: CourtsProps) {
                   </div>
                   <div className="text-right">
                     <div className="flex items-baseline gap-1 justify-end">
-                      <span className="text-xl font-bold text-brand-ink">120₾</span>
+                      <span className="text-xl font-bold text-brand-ink">80₾</span>
                       <span className="text-brand-gray text-sm">
                         /{lang === "ka" ? "საათი" : "hour"}
                       </span>

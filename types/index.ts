@@ -90,6 +90,13 @@ export interface Translation {
   payment_fail_msg: string;
   payment_go_home: string;
   payment_try_again: string;
+
+  // Court selection
+  book_select_court: string;
+  court_1: string;
+  court_2: string;
+  court_1_desc: string;
+  court_2_desc: string;
 }
 
 export const translations: Record<Language, Translation> = {
@@ -120,7 +127,7 @@ export const translations: Record<Language, Translation> = {
     court2_desc:
       "პანორამული ხედით — ეს კორტი გთავაზობთ შთამბეჭდავ ხედს წყნეთის ტყეზე. მთლიანი შუშის გვერდები, LED განათება.",
     court_per_person: "30₾/საათი",
-    court_rental: "120₾/საათი",
+    court_rental: "80₾/საათი",
     court_book_now: "ახლავე დაჯავშნე",
     court_hour: "ადამიანზე",
     court_features_title: "მახასიათებლები:",
@@ -155,8 +162,8 @@ export const translations: Record<Language, Translation> = {
     book_your_phone: "ტელეფონი",
     book_your_email: "ელ-ფოსტა",
     book_players: "მოთამაშეთა რაოდენობა",
-    book_players_2: "2 მოთამაშე — 60₾",
-    book_players_4: "4 მოთამაშე — 120₾",
+    book_players_2: "2 მოთამაშე — 40₾",
+    book_players_4: "4 მოთამაშე — 80₾",
     book_payment_method: "გადახდის მეთოდი",
     book_bog: "BOG Pay (საქართველოს ბანკი)",
     book_tbc: "TBC iPay",
@@ -182,6 +189,12 @@ export const translations: Record<Language, Translation> = {
       "სამწუხაროდ, გადახდა ვერ შესრულდა. გთხოვთ სცადოთ თავიდან.",
     payment_go_home: "მთავარზე დაბრუნება",
     payment_try_again: "თავიდან სცადე",
+
+    book_select_court: "აირჩიეთ კორტი",
+    court_1: "კორტი 1",
+    court_2: "კორტი 2",
+    court_1_desc: "გარე კორტი",
+    court_2_desc: "შიდა კორტი",
   },
   en: {
     nav_home: "Home",
@@ -209,7 +222,7 @@ export const translations: Record<Language, Translation> = {
     court2_desc:
       "Enclosed zone — protected from weather changes, this court is perfect in any season. Artificial lighting and climate control.",
     court_per_person: "30₾/hour",
-    court_rental: "120₾/hour",
+    court_rental: "80₾/hour",
     court_book_now: "Book Now",
     court_hour: "per person",
     court_features_title: "Features:",
@@ -244,8 +257,8 @@ export const translations: Record<Language, Translation> = {
     book_your_phone: "Phone",
     book_your_email: "Email",
     book_players: "Number of Players",
-    book_players_2: "2 Players — 60₾",
-    book_players_4: "4 Players — 120₾",
+    book_players_2: "2 Players — 40₾",
+    book_players_4: "4 Players — 80₾",
     book_payment_method: "Payment Method",
     book_bog: "BOG Pay (Bank of Georgia)",
     book_tbc: "TBC iPay",
@@ -271,6 +284,12 @@ export const translations: Record<Language, Translation> = {
       "Unfortunately, the payment could not be processed. Please try again.",
     payment_go_home: "Return to Home",
     payment_try_again: "Try Again",
+
+    book_select_court: "Select Court",
+    court_1: "Court 1",
+    court_2: "Court 2",
+    court_1_desc: "Outdoor Court",
+    court_2_desc: "Indoor Court",
   },
 };
 
@@ -278,6 +297,7 @@ export interface Reservation {
   id: string;
   date: string; // YYYY-MM-DD
   timeSlots: string[]; // HH:MM array (consecutive)
+  courtId: 1 | 2;
   name: string;
   phone: string;
   email: string;
@@ -287,12 +307,15 @@ export interface Reservation {
   paymentStatus: "pending" | "paid" | "failed";
   orderId?: string;
   createdAt: string;
+  blocked?: boolean;
+  notes?: string;
 }
 
 export interface BookingState {
   step: 1 | 2 | 3;
   date: string;
   timeSlots: string[];
+  courtId: 1 | 2;
   name: string;
   phone: string;
   email: string;

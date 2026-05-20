@@ -8,6 +8,8 @@ interface StepDateProps {
   lang: Language;
   selectedDate: string;
   selectedTimes: string[];
+  selectedCourt: 1 | 2;
+  onCourtChange: (court: 1 | 2) => void;
   onDateChange: (date: string) => void;
   onTimesChange: (slots: string[]) => void;
   onNext: () => void;
@@ -108,6 +110,8 @@ export default function StepDate({
   lang,
   selectedDate,
   selectedTimes,
+  selectedCourt,
+  onCourtChange,
   onDateChange,
   onTimesChange,
   onNext,
@@ -122,12 +126,12 @@ export default function StepDate({
   useEffect(() => {
     if (!selectedDate) return;
     setLoadingSlots(true);
-    fetch(`/api/reservations?date=${selectedDate}`)
+    fetch(`/api/reservations?date=${selectedDate}&courtId=${selectedCourt}`)
       .then((r) => r.json())
       .then((data) => setBookedSlots(data.bookedSlots || []))
       .catch(() => setBookedSlots([]))
       .finally(() => setLoadingSlots(false));
-  }, [selectedDate]);
+  }, [selectedDate, selectedCourt]);
 
   const calDays = generateCalendarDays(viewDate);
   const weekdays = lang === "ka" ? WEEKDAYS_KA : WEEKDAYS_EN;
@@ -151,8 +155,62 @@ export default function StepDate({
 
   const canProceed = selectedDate && selectedTimes.length > 0;
 
+  const courts: { id: 1 | 2; name: string; desc: string; emoji: string }[] = [
+    { id: 1, name: t.court_1, desc: t.court_1_desc, emoji: "🌤️" },
+    { id: 2, name: t.court_2, desc: t.court_2_desc, emoji: "🏠" },
+  ];
+
   return (
     <div className="space-y-8">
+      {/* Court picker */}
+      <div>
+        <h3 className="text-brand-ink font-semibold text-lg mb-4">
+          {t.book_select_court}
+        </h3>
+        <div className="grid grid-cols-2 gap-3">
+          {courts.map((c) => {
+            const sel = selectedCourt === c.id;
+            return (
+              <button
+                key={c.id}
+                type="button"
+                onClick={() => onCourtChange(c.id)}
+                className={`
+                  flex items-center gap-3 p-4 rounded-2xl border-2 transition-all text-left
+                  ${sel
+                    ? "border-primary-400 bg-primary-50 ring-2 ring-primary-100"
+                    : "border-brand-line bg-brand-surface hover:border-brand-mute"
+                  }
+                `}
+              >
+                <div
+                  className={`
+                    w-11 h-11 rounded-xl flex items-center justify-center text-xl flex-shrink-0
+                    ${sel ? "bg-primary-400 text-white" : "bg-white text-brand-ink border border-brand-line"}
+                  `}
+                >
+                  <span aria-hidden>{c.emoji}</span>
+                </div>
+                <div className="min-w-0">
+                  <div className="text-brand-ink font-semibold text-sm leading-tight">
+                    {c.name}
+                  </div>
+                  <div className="text-brand-gray text-xs truncate">{c.desc}</div>
+                </div>
+                <div
+                  className={`
+                    ml-auto w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0
+                    ${sel ? "border-primary-400 bg-primary-400" : "border-brand-line bg-white"}
+                  `}
+                >
+                  {sel && <div className="w-2 h-2 rounded-full bg-white" />}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       {/* Date picker */}
       <div>
         <h3 className="text-brand-ink font-semibold text-lg mb-4">{t.book_select_date}</h3>

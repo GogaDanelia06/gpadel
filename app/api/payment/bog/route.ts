@@ -4,12 +4,15 @@ import { createBOGOrder } from "@/lib/bog";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { reservationId, amount, timeSlots, players } = body as {
+    const { reservationId, amount, timeSlots, players, courtId } = body as {
       reservationId?: string;
       amount?: number;
       timeSlots?: unknown;
       players?: 2 | 4;
+      courtId?: 1 | 2;
     };
+    // courtId is persisted at reservation creation; accepted here for forward compatibility.
+    void courtId;
 
     if (!reservationId) {
       return NextResponse.json(
@@ -27,7 +30,7 @@ export async function POST(request: NextRequest) {
           { status: 400 }
         );
       }
-      const pricePerHour = players === 4 ? 120 : 60;
+      const pricePerHour = players === 4 ? 80 : 60;
       finalAmount = pricePerHour * timeSlots.length;
     }
 

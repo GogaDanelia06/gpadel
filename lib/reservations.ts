@@ -18,7 +18,12 @@ export function readReservations(): Reservation[] {
   }
   try {
     const raw = fs.readFileSync(RESERVATIONS_FILE, "utf-8");
-    return JSON.parse(raw) as Reservation[];
+    const parsed = JSON.parse(raw) as Reservation[];
+    // Backfill missing courtId for legacy data — default to court 1.
+    return parsed.map((r) => ({
+      ...r,
+      courtId: (r.courtId === 1 || r.courtId === 2 ? r.courtId : 1) as 1 | 2,
+    }));
   } catch {
     return [];
   }
@@ -54,11 +59,13 @@ export function getReservationsByDate(date: string): Reservation[] {
 }
 
 /**
- * Returns the flattened set of all booked slots on a given date,
+ * Returns the flattened set of all booked slots on a given date for a specific court,
  * across all active (pending or paid) reservations.
  */
-export function getBookedSlotsForDate(date: string): string[] {
-  const reservations = getReservationsByDate(date);
+export function getBookedSlotsForDate(date: string, courtId: 1 | 2): string[] {
+  const reservations = getReservationsByDate(date).filter(
+    (r) => r.courtId === courtId
+  );
   const slots = new Set<string>();
   for (const r of reservations) {
     if (r.paymentStatus === "failed") continue;
@@ -68,6 +75,34 @@ export function getBookedSlotsForDate(date: string): string[] {
   return Array.from(slots);
 }
 
-export function isSlotBooked(date: string, timeSlot: string): boolean {
-  return getBookedSlotsForDate(date).includes(timeSlot);
+export function isSlotBooked(
+  date: string,
+  timeSlot: string,
+  courtId: 1 | 2
+): boolean {
+  return getBookedSlotsForDate(date, courtId).includes(timeSlot);
+}
+
+export function findReservationById(id: string): Reservation | undefined {
+  return readReservations().find((r) => r.id === id);
+}
+
+export function deleteReservation(id: string): boolean {
+  const reservations = readReservations();
+  const next = reservations.filter((r) => r.id !== id);
+  if (next.length === reservations.length) return false;
+  writeReservations(next);
+  return true;
+}
+
+export function updateReservation(
+  id: string,
+  patch: Partial<Reservation>
+): Reservation | undefined {
+  const reservations = readReservations();
+  const idx = reservations.findIndex((r) => r.id === id);
+  if (idx === -1) return undefined;
+  reservations[idx] = { ...reservations[idx], ...patch, id: reservations[idx].id };
+  writeReservations(reservations);
+  return reservations[idx];
 }

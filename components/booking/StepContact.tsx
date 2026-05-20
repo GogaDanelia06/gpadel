@@ -6,6 +6,7 @@ interface StepContactProps {
   lang: Language;
   date: string;
   timeSlots: string[];
+  courtId: 1 | 2;
   name: string;
   phone: string;
   email: string;
@@ -43,6 +44,7 @@ export default function StepContact({
   lang,
   date,
   timeSlots,
+  courtId,
   name,
   phone,
   email,
@@ -61,7 +63,12 @@ export default function StepContact({
     phone.trim().length >= 6 &&
     email.includes("@");
 
-  const pricePerHour = players === 4 ? 120 : 60;
+  const courtLabel =
+    courtId === 1
+      ? `${t.court_1} (${t.court_1_desc})`
+      : `${t.court_2} (${t.court_2_desc})`;
+
+  const pricePerHour = players === 4 ? 80 : 60;
   const total = pricePerHour * timeSlots.length;
   const formattedDate = date
     ? new Date(date + "T00:00:00").toLocaleDateString(
@@ -88,6 +95,10 @@ export default function StepContact({
                 <span className="font-medium">
                   {t.book_hours_selected.replace("{n}", String(timeSlots.length))}
                 </span>
+              </div>
+              <div className="text-brand-ink">
+                <span className="text-brand-gray">{t.book_select_court}: </span>
+                <span className="font-medium">{courtLabel}</span>
               </div>
             </div>
             <div className="flex items-baseline gap-2 sm:flex-col sm:items-end">

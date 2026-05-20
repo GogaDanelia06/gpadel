@@ -1,5 +1,33 @@
 import { NextRequest, NextResponse } from "next/server";
-import { updateReservationStatus } from "@/lib/reservations";
+import {
+  findReservationById,
+  updateReservationStatus,
+} from "@/lib/reservations";
+import { sendBookingConfirmation } from "@/lib/email";
+
+function fireConfirmationEmail(reservationId: string): void {
+  try {
+    const reservation = findReservationById(reservationId);
+    if (!reservation) return;
+    if (reservation.blocked) return;
+    if (!reservation.email) return;
+    // Fire-and-forget: do not await; swallow errors.
+    void sendBookingConfirmation({
+      to: reservation.email,
+      customerName: reservation.name,
+      date: reservation.date,
+      timeSlots: reservation.timeSlots,
+      courtId: reservation.courtId,
+      players: reservation.players,
+      total: reservation.price,
+      reservationId: reservation.id,
+    }).catch((err) => {
+      console.error("[email] sendBookingConfirmation failed:", err);
+    });
+  } catch (err) {
+    console.error("[email] fireConfirmationEmail error:", err);
+  }
+}
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -24,6 +52,8 @@ export async function GET(request: NextRequest) {
   if (!updated) {
     return NextResponse.json({ error: "Reservation not found" }, { status: 404 });
   }
+
+  fireConfirmationEmail(orderId);
 
   return NextResponse.json({ success: true, orderId, provider });
 }
@@ -65,6 +95,10 @@ export async function POST(request: NextRequest) {
   }
 
   updateReservationStatus(orderId, status, orderId);
+
+  if (status === "paid") {
+    fireConfirmationEmail(orderId);
+  }
 
   return NextResponse.json({ success: true });
 }

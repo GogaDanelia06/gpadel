@@ -40,12 +40,17 @@ export default function StepPayment({
   const [error, setError] = useState<string | null>(null);
 
   const hours = booking.timeSlots.length;
-  const pricePerHour = booking.players === 4 ? 120 : 60;
+  const pricePerHour = booking.players === 4 ? 80 : 60;
   const total = pricePerHour * hours;
 
   const sortedSlots = [...booking.timeSlots].sort(
     (a, b) => orderIndex(a) - orderIndex(b)
   );
+
+  const courtLabel =
+    booking.courtId === 1
+      ? `${t.court_1} (${t.court_1_desc})`
+      : `${t.court_2} (${t.court_2_desc})`;
 
   const providers: { id: "bog" | "tbc"; name: string; desc: string }[] = [
     {
@@ -74,6 +79,7 @@ export default function StepPayment({
         body: JSON.stringify({
           date: booking.date,
           timeSlots: sortedSlots,
+          courtId: booking.courtId,
           name: booking.name,
           phone: booking.phone,
           email: booking.email,
@@ -98,6 +104,7 @@ export default function StepPayment({
           amount: total,
           timeSlots: sortedSlots,
           players: booking.players,
+          courtId: booking.courtId,
         }),
       });
 
@@ -147,6 +154,10 @@ export default function StepPayment({
             <span className="text-brand-ink font-medium">
               {formatTimeRange(booking.timeSlots)}
             </span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-brand-gray text-sm">{t.book_select_court}</span>
+            <span className="text-brand-ink font-medium">{courtLabel}</span>
           </div>
           <div className="flex justify-between items-center">
             <span className="text-brand-gray text-sm">
