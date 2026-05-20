@@ -1,11 +1,9 @@
 "use client";
 
 import { useState, FormEvent } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 export default function AdminLoginPage() {
-  const router = useRouter();
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -20,6 +18,8 @@ export default function AdminLoginPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ password }),
+        credentials: "include",
+        cache: "no-store",
       });
       if (!res.ok) {
         const data = (await res.json().catch(() => ({}))) as { error?: string };
@@ -27,8 +27,11 @@ export default function AdminLoginPage() {
         setLoading(false);
         return;
       }
-      router.replace("/admin");
-      router.refresh();
+      // Hard navigation so the browser sends the freshly-set cookie on the next
+      // request. router.replace() would do a client-side nav and the middleware
+      // wouldn't see the cookie in time, causing a redirect loop back to /login
+      // (which manifests as a stuck "Signing in…" state).
+      window.location.href = "/admin";
     } catch {
       setError("Network error");
       setLoading(false);
