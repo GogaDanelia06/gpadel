@@ -29,7 +29,7 @@ export default function Contact({ lang }: ContactProps) {
       ),
       label: t.contact_address,
       value: "10 გრიგოლ აბაშიძის ქუჩა, Tskneti 0179",
-      href: "https://maps.google.com/?q=Tskneti+Georgia",
+      href: "https://maps.google.com/?q=GPadel+Tskneti+10+Grigol+Abashidze",
     },
     {
       icon: (
@@ -103,7 +103,7 @@ export default function Contact({ lang }: ContactProps) {
           {/* Map placeholder */}
           <div className="rounded-2xl overflow-hidden border border-brand-line shadow-sm h-80 lg:h-full min-h-[320px] bg-white relative">
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2975.123456789!2d44.7458!3d41.7151!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNDHCsDQyJzU0LjQiTiA0NMKwNDQnNDQuOSJF!5e0!3m2!1sen!2sge!4v1234567890"
+              src="https://www.openstreetmap.org/export/embed.html?bbox=44.6800%2C41.7140%2C44.6940%2C41.7240&layer=mapnik&marker=41.71875%2C44.68625"
               width="100%"
               height="100%"
               style={{ border: 0 }}
