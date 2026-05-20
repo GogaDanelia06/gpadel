@@ -1,14 +1,14 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
-import { Language, translations } from "@/types";
+import { translations } from "@/types";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import BookingWizard from "@/components/booking/BookingWizard";
+import { useLanguage } from "@/lib/LanguageContext";
 
 export default function BookPage() {
-  const [lang, setLang] = useState<Language>("ka");
+  const { lang, setLang } = useLanguage();
   const t = translations[lang];
 
   return (

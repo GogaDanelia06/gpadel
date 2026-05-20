@@ -136,6 +136,7 @@ export const translations: Record<Language, Translation> = {
     contact_map_placeholder: "რუქა",
 
     footer_rights: "© 2026 GPadel. ყველა უფლება დაცულია.",
+    footer_lgbtq: "LGBTQ+ მეგობრული სივრცე",
 
     book_title: "კორტის დაჯავშნა",
     book_step1: "თარიღი და დრო",

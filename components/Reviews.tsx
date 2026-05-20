@@ -32,10 +32,8 @@ const reviews = [
       "საუკეთესო პადელის გამოცდილება თბილისის მახლობლად! კორტები სრულყოფილ მდგომარეობაშია და ატმოსფერო უდიდესია. მიყვარს, რომ მთებშია — თითქოს ქალაქიდან გამოქცევა. დაჯავშნა გლუვად ჩაივლო და ფასი ძალიან გონივრულია. ნამდვილად დავბრუნდები!",
   },
 ];
-
 export default function Reviews({ lang }: ReviewsProps) {
   const t = translations[lang];
-
   return (
     <section id="reviews" className="py-24 bg-slate-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -47,7 +45,6 @@ export default function Reviews({ lang }: ReviewsProps) {
           <h2 className="mt-3 text-3xl sm:text-4xl font-black text-white">{t.reviews_title}</h2>
           <p className="mt-4 text-slate-400 text-lg">{t.reviews_subtitle}</p>
         </div>
-
         {/* Review cards */}
         <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
           {reviews.map((review, idx) => (
@@ -68,12 +65,10 @@ export default function Reviews({ lang }: ReviewsProps) {
                   </svg>
                 ))}
               </div>
-
               {/* Review text */}
               <blockquote className="text-slate-300 text-base leading-relaxed mb-6">
                 &ldquo;{lang === "ka" ? review.textKa : review.textEn}&rdquo;
               </blockquote>
-
               {/* Reviewer */}
               <div className="flex items-center gap-4 pt-5 border-t border-slate-700/50">
                 <div className="w-12 h-12 rounded-full bg-gradient-to-br from-green-600 to-green-800 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
@@ -100,7 +95,6 @@ export default function Reviews({ lang }: ReviewsProps) {
             </div>
           ))}
         </div>
-
         {/* Overall rating */}
         <div className="text-center mt-12">
           <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-slate-800/60 border border-slate-700/50">

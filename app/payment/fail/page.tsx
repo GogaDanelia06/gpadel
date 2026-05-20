@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
-import { Language, translations } from "@/types";
+import { translations } from "@/types";
+import { useLanguage } from "@/lib/LanguageContext";
 
 export default function PaymentFailPage() {
-  const [lang] = useState<Language>("ka");
+  const { lang } = useLanguage();
   const t = translations[lang];
 
   return (

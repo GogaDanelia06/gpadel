@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { LanguageProvider } from "@/lib/LanguageContext";
 
 export const metadata: Metadata = {
   title: "GPadel | ჯიპადელი წყნეთში",
@@ -20,10 +21,8 @@ export const metadata: Metadata = {
   openGraph: {
     title: "GPadel | ჯიპადელი წყნეთში",
     description: "Premium padel courts in Tskneti, Georgia. Book online!",
-    url: "https://gpadel.ge",
     siteName: "GPadel",
     locale: "ka_GE",
-    type: "website",
   },
   robots: {
     index: true,
@@ -47,7 +46,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ka" className="scroll-smooth">
-      <body className="bg-slate-900 text-white antialiased">{children}</body>
+      <body className="bg-slate-900 text-white antialiased">
+        <LanguageProvider>{children}</LanguageProvider>
+      </body>
     </html>
   );
 }
