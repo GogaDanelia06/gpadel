@@ -240,7 +240,7 @@ export const translations: Record<Language, Translation> = {
     contact_hours_value: "Daily 09:00 – 02:00",
     contact_map_placeholder: "Map",
 
-    footer_rights: "© 2024 GPadel. All rights reserved.",
+    footer_rights: "© 2026 GPadel. All rights reserved.",
     footer_lgbtq: "LGBTQ+ Friendly Space",
 
     book_title: "Book a Court",

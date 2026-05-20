@@ -15,7 +15,7 @@ export default function AdminHeader() {
     } catch {
       // ignore
     }
-    router.replace("/admin/login");
+    router.replace("/");
     router.refresh();
   }
 
