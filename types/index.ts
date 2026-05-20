@@ -79,6 +79,9 @@ export interface Translation {
   book_name_placeholder: string;
   book_phone_placeholder: string;
   book_email_placeholder: string;
+  book_hours_selected: string;
+  book_max_hours: string;
+  book_total: string;
 
   // Payment pages
   payment_success_title: string;
@@ -167,6 +170,9 @@ export const translations: Record<Language, Translation> = {
     book_name_placeholder: "მაგ: ნინო გელაშვილი",
     book_phone_placeholder: "მაგ: +995 555 123 456",
     book_email_placeholder: "მაგ: nino@example.com",
+    book_hours_selected: "{n} საათი არჩეული",
+    book_max_hours: "მაქს. 8 საათი",
+    book_total: "ჯამი",
 
     payment_success_title: "გადახდა წარმატებულია!",
     payment_success_msg:
@@ -253,6 +259,9 @@ export const translations: Record<Language, Translation> = {
     book_name_placeholder: "e.g. John Smith",
     book_phone_placeholder: "e.g. +995 555 123 456",
     book_email_placeholder: "e.g. john@example.com",
+    book_hours_selected: "{n} hours selected",
+    book_max_hours: "Max. 8 hours",
+    book_total: "Total",
 
     payment_success_title: "Payment Successful!",
     payment_success_msg:
@@ -268,7 +277,7 @@ export const translations: Record<Language, Translation> = {
 export interface Reservation {
   id: string;
   date: string; // YYYY-MM-DD
-  timeSlot: string; // HH:MM
+  timeSlots: string[]; // HH:MM array (consecutive)
   name: string;
   phone: string;
   email: string;
@@ -283,7 +292,7 @@ export interface Reservation {
 export interface BookingState {
   step: 1 | 2 | 3;
   date: string;
-  timeSlot: string;
+  timeSlots: string[];
   name: string;
   phone: string;
   email: string;

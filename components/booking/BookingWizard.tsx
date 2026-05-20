@@ -16,7 +16,7 @@ export default function BookingWizard({ lang }: BookingWizardProps) {
   const [booking, setBooking] = useState<BookingState>({
     step: 1,
     date: "",
-    timeSlot: "",
+    timeSlots: [],
     name: "",
     phone: "",
     email: "",
@@ -87,15 +87,21 @@ export default function BookingWizard({ lang }: BookingWizardProps) {
           <StepDate
             lang={lang}
             selectedDate={booking.date}
-            selectedTime={booking.timeSlot}
-            onDateChange={(d) => setBooking((b) => ({ ...b, date: d }))}
-            onTimeChange={(t) => setBooking((b) => ({ ...b, timeSlot: t }))}
+            selectedTimes={booking.timeSlots}
+            onDateChange={(d) =>
+              setBooking((b) => ({ ...b, date: d, timeSlots: [] }))
+            }
+            onTimesChange={(slots) =>
+              setBooking((b) => ({ ...b, timeSlots: slots }))
+            }
             onNext={goNext}
           />
         )}
         {booking.step === 2 && (
           <StepContact
             lang={lang}
+            date={booking.date}
+            timeSlots={booking.timeSlots}
             name={booking.name}
             phone={booking.phone}
             email={booking.email}

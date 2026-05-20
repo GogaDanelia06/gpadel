@@ -45,7 +45,6 @@ export default function BookPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <BookingWizard lang={lang} />
         </div>
-
         {/* Info bar */}
         <div className="max-w-2xl mx-auto px-4 mt-10">
           <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-brand-gray">

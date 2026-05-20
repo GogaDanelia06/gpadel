@@ -53,11 +53,21 @@ export function getReservationsByDate(date: string): Reservation[] {
   return readReservations().filter((r) => r.date === date);
 }
 
+/**
+ * Returns the flattened set of all booked slots on a given date,
+ * across all active (pending or paid) reservations.
+ */
+export function getBookedSlotsForDate(date: string): string[] {
+  const reservations = getReservationsByDate(date);
+  const slots = new Set<string>();
+  for (const r of reservations) {
+    if (r.paymentStatus === "failed") continue;
+    const list = Array.isArray(r.timeSlots) ? r.timeSlots : [];
+    for (const s of list) slots.add(s);
+  }
+  return Array.from(slots);
+}
+
 export function isSlotBooked(date: string, timeSlot: string): boolean {
-  return readReservations().some(
-    (r) =>
-      r.date === date &&
-      r.timeSlot === timeSlot &&
-      r.paymentStatus !== "failed"
-  );
+  return getBookedSlotsForDate(date).includes(timeSlot);
 }

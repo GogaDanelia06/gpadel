@@ -1,21 +1,21 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { format, addDays, isBefore, startOfDay, isToday, isSameDay } from "date-fns";
+import { format, isBefore, startOfDay, isToday } from "date-fns";
 import { Language, translations } from "@/types";
 
 interface StepDateProps {
   lang: Language;
   selectedDate: string;
-  selectedTime: string;
+  selectedTimes: string[];
   onDateChange: (date: string) => void;
-  onTimeChange: (time: string) => void;
+  onTimesChange: (slots: string[]) => void;
   onNext: () => void;
 }
 
 function generateTimeSlots(): string[] {
   const slots: string[] = [];
-  // 09:00 to 01:00 (next day) inclusive — 17 slots
+  // 09:00 to 23:00 then 00:00 and 01:00 (next day) — 17 slots
   for (let h = 9; h <= 23; h++) {
     slots.push(`${String(h).padStart(2, "0")}:00`);
   }
@@ -58,12 +58,58 @@ const MONTHS_EN = [
   "July","August","September","October","November","December",
 ];
 
+const MAX_HOURS = 8;
+
+/**
+ * Compute the next selection after a click given the multi-select rules.
+ * - clicking a booked slot is a no-op
+ * - empty selection: start with [slot]
+ * - clicking a slot in the current selection: remove only if at edge; ignore if middle
+ * - clicking a slot not selected:
+ *     - adjacent to current range -> add (if length < MAX_HOURS)
+ *     - non-adjacent -> reset to [slot]
+ */
+function handleSlotClick(
+  slot: string,
+  allSlots: string[],
+  current: string[],
+  booked: string[]
+): string[] {
+  if (booked.includes(slot)) return current;
+
+  const idxInAll = allSlots.indexOf(slot);
+  if (idxInAll === -1) return current;
+
+  if (current.length === 0) return [slot];
+
+  const sortedCurrent = [...current].sort(
+    (a, b) => allSlots.indexOf(a) - allSlots.indexOf(b)
+  );
+  const firstIdx = allSlots.indexOf(sortedCurrent[0]);
+  const lastIdx = allSlots.indexOf(sortedCurrent[sortedCurrent.length - 1]);
+
+  if (current.includes(slot)) {
+    if (idxInAll === firstIdx || idxInAll === lastIdx) {
+      const next = current.filter((s) => s !== slot);
+      return next;
+    }
+    return current; // middle click — would create a gap, ignore
+  }
+
+  if (idxInAll === firstIdx - 1 || idxInAll === lastIdx + 1) {
+    if (current.length >= MAX_HOURS) return current;
+    return [...current, slot];
+  }
+
+  return [slot];
+}
+
 export default function StepDate({
   lang,
   selectedDate,
-  selectedTime,
+  selectedTimes,
   onDateChange,
-  onTimeChange,
+  onTimesChange,
   onNext,
 }: StepDateProps) {
   const t = translations[lang];
@@ -94,10 +140,16 @@ export default function StepDate({
     if (isBefore(startOfDay(day), today)) return;
     if (day.getMonth() !== viewDate.getMonth()) return;
     onDateChange(format(day, "yyyy-MM-dd"));
-    onTimeChange("");
   };
 
-  const canProceed = selectedDate && selectedTime;
+  const handleSlotToggle = (slot: string) => {
+    const next = handleSlotClick(slot, timeSlots, selectedTimes, bookedSlots);
+    if (next !== selectedTimes) {
+      onTimesChange(next);
+    }
+  };
+
+  const canProceed = selectedDate && selectedTimes.length > 0;
 
   return (
     <div className="space-y-8">
@@ -188,27 +240,44 @@ export default function StepDate({
               <div className="inline-block w-6 h-6 border-2 border-primary-400 border-t-transparent rounded-full animate-spin" />
             </div>
           ) : (
-            <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-2">
-              {timeSlots.map((slot) => {
-                const booked = bookedSlots.includes(slot);
-                const sel = selectedTime === slot;
-                return (
-                  <button
-                    key={slot}
-                    onClick={() => !booked && onTimeChange(slot)}
-                    disabled={booked}
-                    className={`
-                      py-2.5 px-3 rounded-lg text-sm font-medium transition-all
-                      ${booked ? "bg-brand-line text-brand-mute line-through cursor-not-allowed" : ""}
-                      ${!booked && !sel ? "bg-white border border-brand-line text-brand-ink hover:border-primary-400 hover:bg-primary-50" : ""}
-                      ${sel ? "bg-primary-400 text-white border border-primary-400 shadow-md" : ""}
-                    `}
-                  >
-                    {slot}
-                  </button>
-                );
-              })}
-            </div>
+            <>
+              <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-2">
+                {timeSlots.map((slot) => {
+                  const booked = bookedSlots.includes(slot);
+                  const sel = selectedTimes.includes(slot);
+                  return (
+                    <button
+                      key={slot}
+                      onClick={() => handleSlotToggle(slot)}
+                      disabled={booked}
+                      className={`
+                        py-2.5 px-3 rounded-lg text-sm font-medium transition-all
+                        ${booked ? "bg-brand-line text-brand-mute line-through cursor-not-allowed" : ""}
+                        ${!booked && !sel ? "bg-white border border-brand-line text-brand-ink hover:border-primary-400 hover:bg-primary-50" : ""}
+                        ${sel ? "bg-primary-400 text-white border border-primary-400 shadow-md" : ""}
+                      `}
+                    >
+                      {slot}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Max hours caption */}
+              <div className="mt-2 text-xs text-brand-mute">{t.book_max_hours}</div>
+
+              {/* Selection summary */}
+              {selectedTimes.length > 0 && (
+                <div className="mt-4 flex items-center justify-between bg-primary-50 border border-primary-400 rounded-xl px-4 py-3">
+                  <span className="text-brand-ink font-semibold">
+                    {t.book_hours_selected.replace("{n}", String(selectedTimes.length))}
+                  </span>
+                  <span className="text-primary-500 font-bold">
+                    {selectedTimes.length}h
+                  </span>
+                </div>
+              )}
+            </>
           )}
         </div>
       )}

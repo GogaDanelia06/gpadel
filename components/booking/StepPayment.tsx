@@ -11,6 +11,24 @@ interface StepPaymentProps {
   onBack: () => void;
 }
 
+function orderIndex(s: string): number {
+  const [h] = s.split(":");
+  const n = parseInt(h, 10);
+  // 09–23 -> 9..23 ; 00 -> 24 ; 01 -> 25 (slots that fall after midnight)
+  return n >= 9 ? n : n + 24;
+}
+
+function formatTimeRange(timeSlots: string[]): string {
+  if (timeSlots.length === 0) return "—";
+  const sorted = [...timeSlots].sort((a, b) => orderIndex(a) - orderIndex(b));
+  const first = sorted[0];
+  const last = sorted[sorted.length - 1];
+  const [lh] = last.split(":");
+  const endHour = (parseInt(lh, 10) + 1) % 24;
+  const end = `${String(endHour).padStart(2, "0")}:00`;
+  return `${first} – ${end}`;
+}
+
 export default function StepPayment({
   lang,
   booking,
@@ -21,7 +39,13 @@ export default function StepPayment({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const price = booking.players === 4 ? 120 : 60;
+  const hours = booking.timeSlots.length;
+  const pricePerHour = booking.players === 4 ? 120 : 60;
+  const total = pricePerHour * hours;
+
+  const sortedSlots = [...booking.timeSlots].sort(
+    (a, b) => orderIndex(a) - orderIndex(b)
+  );
 
   const providers: { id: "bog" | "tbc"; name: string; desc: string }[] = [
     {
@@ -38,6 +62,7 @@ export default function StepPayment({
 
   const handleConfirm = async () => {
     if (!booking.paymentMethod) return;
+    if (hours < 1) return;
     setLoading(true);
     setError(null);
 
@@ -48,7 +73,7 @@ export default function StepPayment({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           date: booking.date,
-          timeSlot: booking.timeSlot,
+          timeSlots: sortedSlots,
           name: booking.name,
           phone: booking.phone,
           email: booking.email,
@@ -70,7 +95,9 @@ export default function StepPayment({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           reservationId: reservation.id,
-          amount: price,
+          amount: total,
+          timeSlots: sortedSlots,
+          players: booking.players,
         }),
       });
 
@@ -88,6 +115,15 @@ export default function StepPayment({
       setLoading(false);
     }
   };
+
+  const hoursLabel =
+    hours === 1
+      ? lang === "ka"
+        ? "1 საათი"
+        : "1 hour"
+      : lang === "ka"
+      ? `${hours} საათი`
+      : `${hours} hours`;
 
   return (
     <div className="space-y-6">
@@ -108,22 +144,35 @@ export default function StepPayment({
           </div>
           <div className="flex justify-between items-center">
             <span className="text-brand-gray text-sm">{t.book_summary_time}</span>
-            <span className="text-brand-ink font-medium">{booking.timeSlot || "—"}</span>
+            <span className="text-brand-ink font-medium">
+              {formatTimeRange(booking.timeSlots)}
+            </span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-brand-gray text-sm">
+              {lang === "ka" ? "ხანგრძლივობა" : "Duration"}
+            </span>
+            <span className="text-brand-ink font-medium">{hoursLabel}</span>
           </div>
           <div className="flex justify-between items-center">
             <span className="text-brand-gray text-sm">{t.book_summary_players}</span>
             <span className="text-brand-ink font-medium">
-              {booking.players}{" "}
-              {lang === "ka" ? "მოთამაშე" : "players"}
+              {booking.players} {lang === "ka" ? "მოთამაშე" : "players"}
             </span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-brand-gray text-sm">
+              {lang === "ka" ? "ფასი/საათი" : "Price/hour"}
+            </span>
+            <span className="text-brand-ink font-medium">{pricePerHour}₾</span>
           </div>
           <div className="flex justify-between items-center">
             <span className="text-brand-gray text-sm">{lang === "ka" ? "სახელი" : "Name"}</span>
             <span className="text-brand-ink font-medium">{booking.name}</span>
           </div>
           <div className="border-t border-brand-line pt-3 mt-3 flex justify-between items-center">
-            <span className="text-brand-ink font-semibold">{t.book_summary_price}</span>
-            <span className="text-2xl font-black text-primary-400">{price}₾</span>
+            <span className="text-brand-ink font-semibold">{t.book_total}</span>
+            <span className="text-2xl font-black text-primary-400">{total}₾</span>
           </div>
         </div>
       </div>
@@ -191,7 +240,7 @@ export default function StepPayment({
         </button>
         <button
           onClick={handleConfirm}
-          disabled={!booking.paymentMethod || loading}
+          disabled={!booking.paymentMethod || loading || hours < 1}
           className="px-8 py-4 bg-primary-400 hover:bg-primary-500 disabled:bg-brand-line disabled:text-brand-mute disabled:cursor-not-allowed text-white font-bold rounded-xl transition-all flex items-center gap-2"
         >
           {loading ? (

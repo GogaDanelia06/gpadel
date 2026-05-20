@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { v4 as uuidv4 } from "uuid";
-import { addReservation, getReservationsByDate } from "@/lib/reservations";
+import {
+  addReservation,
+  getBookedSlotsForDate,
+} from "@/lib/reservations";
 import { Reservation } from "@/types";
+
+const SLOT_REGEX = /^([01]\d|2[0-3]):00$/;
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -11,10 +16,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "date param required" }, { status: 400 });
   }
 
-  const reservations = getReservationsByDate(date);
-  const bookedSlots = reservations
-    .filter((r) => r.paymentStatus !== "failed")
-    .map((r) => r.timeSlot);
+  const bookedSlots = getBookedSlotsForDate(date);
 
   return NextResponse.json({ bookedSlots });
 }
@@ -22,18 +24,77 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { date, timeSlot, name, phone, email, players, paymentMethod } = body;
+    const {
+      date,
+      timeSlots,
+      name,
+      phone,
+      email,
+      players,
+      paymentMethod,
+    } = body as {
+      date?: string;
+      timeSlots?: unknown;
+      name?: string;
+      phone?: string;
+      email?: string;
+      players?: 2 | 4;
+      paymentMethod?: "bog" | "tbc";
+    };
 
-    if (!date || !timeSlot || !name || !phone || !email || !players || !paymentMethod) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    if (
+      !date ||
+      !Array.isArray(timeSlots) ||
+      !name ||
+      !phone ||
+      !email ||
+      !players ||
+      !paymentMethod
+    ) {
+      return NextResponse.json(
+        { error: "Missing required fields" },
+        { status: 400 }
+      );
     }
 
-    const price = players === 4 ? 120 : 60;
+    if (timeSlots.length < 1 || timeSlots.length > 8) {
+      return NextResponse.json(
+        { error: "timeSlots must contain between 1 and 8 entries" },
+        { status: 400 }
+      );
+    }
+
+    if (
+      !timeSlots.every(
+        (s): s is string => typeof s === "string" && SLOT_REGEX.test(s)
+      )
+    ) {
+      return NextResponse.json(
+        { error: "timeSlots contains invalid time format" },
+        { status: 400 }
+      );
+    }
+
+    // Conflict check — reject if any requested slot is already booked
+    const alreadyBooked = getBookedSlotsForDate(date);
+    const conflicts = timeSlots.filter((s) => alreadyBooked.includes(s));
+    if (conflicts.length > 0) {
+      return NextResponse.json(
+        {
+          error: "One or more selected time slots are already booked",
+          conflicts,
+        },
+        { status: 409 }
+      );
+    }
+
+    const pricePerHour = players === 4 ? 120 : 60;
+    const price = pricePerHour * timeSlots.length;
 
     const reservation: Reservation = {
       id: uuidv4(),
       date,
-      timeSlot,
+      timeSlots,
       name,
       phone,
       email,
