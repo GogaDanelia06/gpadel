@@ -2,6 +2,7 @@
 
 import { Reservation } from "@/types";
 import { useState } from "react";
+import { useToast } from "@/components/ui/ToastProvider";
 
 interface ReservationTableProps {
   reservations: Reservation[];
@@ -61,6 +62,7 @@ export default function ReservationTable({
   emptyHint,
 }: ReservationTableProps) {
   const [busyId, setBusyId] = useState<string | null>(null);
+  const toast = useToast();
 
   async function markPaid(id: string) {
     setBusyId(id);
@@ -70,7 +72,14 @@ export default function ReservationTable({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: "paid" }),
       });
-      if (res.ok && onChange) onChange();
+      if (res.ok) {
+        toast.success("Marked as paid");
+        onChange?.();
+      } else {
+        toast.error("Could not update reservation");
+      }
+    } catch {
+      toast.error("Network error");
     } finally {
       setBusyId(null);
     }
@@ -83,7 +92,14 @@ export default function ReservationTable({
       const res = await fetch(`/api/admin/reservations/${id}`, {
         method: "DELETE",
       });
-      if (res.ok && onChange) onChange();
+      if (res.ok) {
+        toast.success("Reservation removed");
+        onChange?.();
+      } else {
+        toast.error("Could not remove reservation");
+      }
+    } catch {
+      toast.error("Network error");
     } finally {
       setBusyId(null);
     }

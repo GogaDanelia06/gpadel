@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Language, translations } from "@/types";
 
 interface StepContactProps {
@@ -19,18 +20,14 @@ interface StepContactProps {
   onBack: () => void;
 }
 
+function orderIndex(s: string): number {
+  const [h] = s.split(":");
+  const n = parseInt(h, 10);
+  return n >= 9 ? n : n + 24;
+}
+
 function formatTimeRange(timeSlots: string[]): string {
   if (timeSlots.length === 0) return "—";
-  // Sort by hour-of-day index using the same canonical ordering used in StepDate.
-  // We can't import from StepDate, so reconstruct locally; the slot strings sort
-  // correctly lexicographically if we treat 00:00/01:00 as "after midnight"
-  // (the day's slots run 09:00–23:00, then 00:00, 01:00).
-  const orderIndex = (s: string): number => {
-    const [h] = s.split(":");
-    const n = parseInt(h, 10);
-    // 09–23 -> 9..23 ; 00 -> 24 ; 01 -> 25
-    return n >= 9 ? n : n + 24;
-  };
   const sorted = [...timeSlots].sort((a, b) => orderIndex(a) - orderIndex(b));
   const first = sorted[0];
   const last = sorted[sorted.length - 1];
@@ -38,6 +35,12 @@ function formatTimeRange(timeSlots: string[]): string {
   const endHour = (parseInt(lh, 10) + 1) % 24;
   const end = `${String(endHour).padStart(2, "0")}:00`;
   return `${first} – ${end}`;
+}
+
+interface BreakdownItem {
+  time: string;
+  price: number;
+  ruleLabel: string;
 }
 
 export default function StepContact({
@@ -58,6 +61,38 @@ export default function StepContact({
 }: StepContactProps) {
   const t = translations[lang];
 
+  const [subtotal, setSubtotal] = useState(0);
+  const [breakdown, setBreakdown] = useState<BreakdownItem[]>([]);
+  const [pricingLoading, setPricingLoading] = useState(false);
+  const [showBreakdown, setShowBreakdown] = useState(false);
+
+  useEffect(() => {
+    if (!date || timeSlots.length === 0) {
+      setSubtotal(0);
+      setBreakdown([]);
+      return;
+    }
+    const ctrl = new AbortController();
+    setPricingLoading(true);
+    const sortedSlots = [...timeSlots].sort(
+      (a, b) => orderIndex(a) - orderIndex(b)
+    );
+    const url = `/api/pricing?date=${encodeURIComponent(
+      date
+    )}&timeSlots=${encodeURIComponent(sortedSlots.join(","))}&players=${players}`;
+    fetch(url, { signal: ctrl.signal, cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : { subtotal: 0, breakdown: [] }))
+      .then((data: { subtotal: number; breakdown: BreakdownItem[] }) => {
+        setSubtotal(data.subtotal);
+        setBreakdown(data.breakdown ?? []);
+      })
+      .catch(() => {
+        // Aborts or network errors — keep current state.
+      })
+      .finally(() => setPricingLoading(false));
+    return () => ctrl.abort();
+  }, [date, timeSlots, players]);
+
   const canProceed =
     name.trim().length >= 2 &&
     phone.trim().length >= 6 &&
@@ -68,14 +103,16 @@ export default function StepContact({
       ? `${t.court_1} (${t.court_1_desc})`
       : `${t.court_2} (${t.court_2_desc})`;
 
-  const pricePerHour = players === 4 ? 80 : 60;
-  const total = pricePerHour * timeSlots.length;
   const formattedDate = date
     ? new Date(date + "T00:00:00").toLocaleDateString(
         lang === "ka" ? "ka-GE" : "en-GB",
         { weekday: "short", year: "numeric", month: "short", day: "numeric" }
       )
     : "—";
+
+  const sortedBreakdown = [...breakdown].sort(
+    (a, b) => orderIndex(a.time) - orderIndex(b.time)
+  );
 
   return (
     <div className="space-y-6">
@@ -103,9 +140,62 @@ export default function StepContact({
             </div>
             <div className="flex items-baseline gap-2 sm:flex-col sm:items-end">
               <span className="text-brand-gray text-xs">{t.book_total}</span>
-              <span className="text-2xl font-black text-primary-400">{total}₾</span>
+              <span
+                className={`text-2xl font-black text-primary-400 transition-opacity ${
+                  pricingLoading ? "opacity-60" : ""
+                }`}
+              >
+                {subtotal}₾
+              </span>
             </div>
           </div>
+
+          {sortedBreakdown.length > 0 && (
+            <div className="mt-3 pt-3 border-t border-brand-line">
+              <button
+                type="button"
+                onClick={() => setShowBreakdown((v) => !v)}
+                className="text-xs font-semibold text-brand-gray hover:text-primary-500 transition-colors inline-flex items-center gap-1"
+              >
+                {t.price_breakdown}
+                <svg
+                  className={`w-3 h-3 transition-transform ${
+                    showBreakdown ? "rotate-180" : ""
+                  }`}
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </button>
+              {showBreakdown && (
+                <ul className="mt-2 space-y-1 text-xs">
+                  {sortedBreakdown.map((s) => (
+                    <li
+                      key={s.time}
+                      className="flex justify-between text-brand-gray"
+                    >
+                      <span>
+                        <span className="font-mono text-brand-ink">
+                          {s.time}
+                        </span>
+                        <span className="text-brand-mute"> · {s.ruleLabel}</span>
+                      </span>
+                      <span className="text-brand-ink font-medium">
+                        {s.price}₾
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
         </div>
       )}
 

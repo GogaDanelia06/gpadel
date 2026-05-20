@@ -2,10 +2,12 @@
 
 import { Reservation } from "@/types";
 import { useMemo } from "react";
+import { Skeleton } from "@/components/ui/Skeleton";
 
 interface WeekGridProps {
   reservations: Reservation[];
   weekStart: Date; // Monday
+  loading?: boolean;
   onEmptyClick?: (date: string, slot: string, courtId: 1 | 2) => void;
 }
 
@@ -32,6 +34,44 @@ function weekdayLabel(d: Date): string {
 
 function dayLabel(d: Date): string {
   return d.toLocaleDateString("en-GB", { day: "2-digit", month: "short" });
+}
+
+function CourtGridSkeleton({ courtId }: { courtId: 1 | 2 }) {
+  return (
+    <div className="bg-white border border-brand-line rounded-2xl p-4">
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="font-bold text-brand-ink">Court {courtId}</h3>
+        <span className="text-xs text-brand-mute">
+          {courtId === 1 ? "Outdoor" : "Panorama"}
+        </span>
+      </div>
+      <div className="overflow-x-auto">
+        <div className="min-w-[640px]">
+          <div className="grid grid-cols-[60px_repeat(7,minmax(0,1fr))] gap-1 mb-1">
+            <div className="py-1" />
+            {Array.from({ length: 7 }).map((_, i) => (
+              <div key={i} className="py-1 flex justify-center">
+                <Skeleton className="h-6 w-12 rounded-md" />
+              </div>
+            ))}
+          </div>
+          {Array.from({ length: TIME_SLOTS.length }).map((_, row) => (
+            <div
+              key={row}
+              className="grid grid-cols-[60px_repeat(7,minmax(0,1fr))] gap-1 mb-1"
+            >
+              <div className="text-[11px] text-brand-mute font-semibold flex items-center justify-end pr-2">
+                <Skeleton className="h-3 w-8" />
+              </div>
+              {Array.from({ length: 7 }).map((_, col) => (
+                <Skeleton key={col} className="h-9 rounded-md" />
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 function CourtGrid({
@@ -149,8 +189,17 @@ function CourtGrid({
 export default function WeekGrid({
   reservations,
   weekStart,
+  loading,
   onEmptyClick,
 }: WeekGridProps) {
+  if (loading) {
+    return (
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+        <CourtGridSkeleton courtId={1} />
+        <CourtGridSkeleton courtId={2} />
+      </div>
+    );
+  }
   return (
     <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
       <CourtGrid

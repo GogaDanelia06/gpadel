@@ -97,6 +97,20 @@ export interface Translation {
   court_2: string;
   court_1_desc: string;
   court_2_desc: string;
+
+  // Gallery
+  gallery_title: string;
+  gallery_subtitle: string;
+
+  // Pricing / discounts
+  price_breakdown: string;
+  discount_code: string;
+  apply_code: string;
+  code_invalid: string;
+  code_applied: string;
+  remove_code: string;
+  subtotal: string;
+  discount_label: string;
 }
 
 export const translations: Record<Language, Translation> = {
@@ -195,6 +209,18 @@ export const translations: Record<Language, Translation> = {
     court_2: "კორტი 2",
     court_1_desc: "გარე კორტი",
     court_2_desc: "შიდა კორტი",
+
+    gallery_title: "ფოტო გალერეა",
+    gallery_subtitle: "გადახედე ჩვენი კორტებს",
+
+    price_breakdown: "ფასების დაშლა",
+    discount_code: "ფასდაკლების კოდი",
+    apply_code: "გამოყენება",
+    code_invalid: "კოდი არასწორი ან ვადაგასული",
+    code_applied: "ფასდაკლება გამოყენებულია",
+    remove_code: "წაშლა",
+    subtotal: "ჯამი",
+    discount_label: "ფასდაკლება",
   },
   en: {
     nav_home: "Home",
@@ -290,6 +316,18 @@ export const translations: Record<Language, Translation> = {
     court_2: "Court 2",
     court_1_desc: "Outdoor Court",
     court_2_desc: "Panorama Court",
+
+    gallery_title: "Photo Gallery",
+    gallery_subtitle: "Take a look at our courts",
+
+    price_breakdown: "Price Breakdown",
+    discount_code: "Discount Code",
+    apply_code: "Apply",
+    code_invalid: "Invalid or expired code",
+    code_applied: "Discount applied",
+    remove_code: "Remove",
+    subtotal: "Subtotal",
+    discount_label: "Discount",
   },
 };
 
@@ -309,6 +347,37 @@ export interface Reservation {
   createdAt: string;
   blocked?: boolean;
   notes?: string;
+  discountCode?: string;
+  originalPrice?: number;
+}
+
+export interface PricingRule {
+  id: string;
+  label: string;
+  days: number[]; // 1=Mon ... 7=Sun
+  startHour: number; // 0-23 inclusive
+  endHour: number; // 0-26 exclusive (>24 means after-midnight continuation)
+  pricePerHour: number;
+  fourPlayerMultiplier: number;
+}
+
+export interface DiscountCode {
+  code: string;
+  type: "percent" | "fixed";
+  value: number;
+  maxUses?: number;
+  uses: number;
+  expiresAt?: string;
+  active: boolean;
+  createdAt: string;
+}
+
+export interface PricingBreakdown {
+  slots: Array<{ time: string; price: number; ruleLabel: string }>;
+  subtotal: number;
+  discount: number;
+  total: number;
+  appliedCode?: string;
 }
 
 export interface BookingState {

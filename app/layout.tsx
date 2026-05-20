@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { LanguageProvider } from "@/lib/LanguageContext";
+import { ToastProvider } from "@/components/ui/ToastProvider";
 
 export const metadata: Metadata = {
   title: "GPadel | ჯიპადელი წყნეთში",
@@ -18,6 +19,13 @@ export const metadata: Metadata = {
     "GPadel",
   ],
   authors: [{ name: "GPadel" }],
+  manifest: "/manifest.webmanifest",
+  applicationName: "GPadel",
+  appleWebApp: {
+    capable: true,
+    title: "GPadel",
+    statusBarStyle: "default",
+  },
   openGraph: {
     title: "GPadel | ჯიპადელი წყნეთში",
     description: "Premium padel courts in Tskneti, Georgia. Book online!",
@@ -29,7 +37,9 @@ export const metadata: Metadata = {
     follow: true,
   },
   icons: {
-    icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%2316a34a'/><text y='.9em' font-size='65' x='17'>G</text></svg>",
+    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
+    apple: [{ url: "/icon.svg", type: "image/svg+xml" }],
+    shortcut: ["/icon.svg"],
   },
 };
 
@@ -47,7 +57,9 @@ export default function RootLayout({
   return (
     <html lang="ka" className="scroll-smooth">
       <body className="bg-white text-brand-ink antialiased">
-        <LanguageProvider>{children}</LanguageProvider>
+        <LanguageProvider>
+          <ToastProvider>{children}</ToastProvider>
+        </LanguageProvider>
       </body>
     </html>
   );

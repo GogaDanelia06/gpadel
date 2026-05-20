@@ -4,6 +4,8 @@ import {
   addReservation,
   getBookedSlotsForDate,
 } from "@/lib/reservations";
+import { calculateBookingPrice } from "@/lib/pricing";
+import { findCode, isValidCode, applyDiscount } from "@/lib/discounts";
 import { Reservation } from "@/types";
 
 const SLOT_REGEX = /^([01]\d|2[0-3]):00$/;
@@ -46,6 +48,7 @@ export async function POST(request: NextRequest) {
       email,
       players,
       paymentMethod,
+      discountCode,
     } = body as {
       date?: string;
       timeSlots?: unknown;
@@ -55,6 +58,7 @@ export async function POST(request: NextRequest) {
       email?: string;
       players?: 2 | 4;
       paymentMethod?: "bog" | "tbc";
+      discountCode?: string;
     };
 
     if (
@@ -110,8 +114,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const pricePerHour = players === 4 ? 80 : 60;
-    const price = pricePerHour * timeSlots.length;
+    // Rule-based pricing
+    const { subtotal } = await calculateBookingPrice(date, timeSlots, players);
+
+    // Optional discount
+    let appliedCode: string | undefined;
+    let finalPrice = subtotal;
+    if (typeof discountCode === "string" && discountCode.trim().length > 0) {
+      const found = await findCode(discountCode);
+      if (isValidCode(found)) {
+        const { total } = applyDiscount(subtotal, found);
+        finalPrice = total;
+        appliedCode = found.code;
+      }
+    }
 
     const reservation: Reservation = {
       id: uuidv4(),
@@ -122,7 +138,9 @@ export async function POST(request: NextRequest) {
       phone,
       email,
       players,
-      price,
+      price: finalPrice,
+      originalPrice: subtotal,
+      discountCode: appliedCode,
       paymentMethod,
       paymentStatus: "pending",
       createdAt: new Date().toISOString(),

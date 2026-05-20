@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Language, translations } from "@/types";
 import { BookingState } from "@/types";
+import { useToast } from "@/components/ui/ToastProvider";
 
 interface StepPaymentProps {
   lang: Language;
@@ -29,6 +30,18 @@ function formatTimeRange(timeSlots: string[]): string {
   return `${first} – ${end}`;
 }
 
+interface BreakdownItem {
+  time: string;
+  price: number;
+  ruleLabel: string;
+}
+
+interface AppliedDiscount {
+  code: string;
+  label: string;
+  discount: number;
+}
+
 export default function StepPayment({
   lang,
   booking,
@@ -36,13 +49,21 @@ export default function StepPayment({
   onBack,
 }: StepPaymentProps) {
   const t = translations[lang];
+  const toast = useToast();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const hours = booking.timeSlots.length;
-  const pricePerHour = booking.players === 4 ? 80 : 60;
-  const total = pricePerHour * hours;
+  const [subtotal, setSubtotal] = useState(0);
+  const [breakdown, setBreakdown] = useState<BreakdownItem[]>([]);
+  const [pricingLoading, setPricingLoading] = useState(false);
 
+  // Discount-code UI state
+  const [codeInput, setCodeInput] = useState("");
+  const [applied, setApplied] = useState<AppliedDiscount | null>(null);
+  const [codeError, setCodeError] = useState<string | null>(null);
+  const [applyingCode, setApplyingCode] = useState(false);
+
+  const hours = booking.timeSlots.length;
   const sortedSlots = [...booking.timeSlots].sort(
     (a, b) => orderIndex(a) - orderIndex(b)
   );
@@ -51,6 +72,71 @@ export default function StepPayment({
     booking.courtId === 1
       ? `${t.court_1} (${t.court_1_desc})`
       : `${t.court_2} (${t.court_2_desc})`;
+
+  // Fetch live subtotal via the pricing endpoint
+  useEffect(() => {
+    if (!booking.date || sortedSlots.length === 0) {
+      setSubtotal(0);
+      setBreakdown([]);
+      return;
+    }
+    const ctrl = new AbortController();
+    setPricingLoading(true);
+    const url = `/api/pricing?date=${encodeURIComponent(
+      booking.date
+    )}&timeSlots=${encodeURIComponent(sortedSlots.join(","))}&players=${
+      booking.players
+    }`;
+    fetch(url, { signal: ctrl.signal, cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : { subtotal: 0, breakdown: [] }))
+      .then((data: { subtotal: number; breakdown: BreakdownItem[] }) => {
+        setSubtotal(data.subtotal);
+        setBreakdown(data.breakdown ?? []);
+      })
+      .catch(() => {
+        // ignore aborts
+      })
+      .finally(() => setPricingLoading(false));
+    return () => ctrl.abort();
+    // sortedSlots is derived from booking.timeSlots; depend on the source.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [booking.date, booking.timeSlots, booking.players]);
+
+  // If players/slots/date change, any applied discount may have a stale total.
+  // We don't drop the code — we re-validate against the new subtotal.
+  useEffect(() => {
+    if (!applied) return;
+    let aborted = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/discount/validate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ code: applied.code, subtotal }),
+        });
+        const data = await res.json();
+        if (aborted) return;
+        if (res.ok && data.valid) {
+          setApplied({
+            code: data.code,
+            label: data.label,
+            discount: data.discount,
+          });
+        } else {
+          setApplied(null);
+        }
+      } catch {
+        // ignore
+      }
+    })();
+    return () => {
+      aborted = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [subtotal]);
+
+  const discount = applied?.discount ?? 0;
+  const total = Math.max(0, subtotal - discount);
 
   const providers: { id: "bog" | "tbc"; name: string; desc: string }[] = [
     {
@@ -64,6 +150,46 @@ export default function StepPayment({
       desc: lang === "ka" ? "თიბისი ბანკი" : "TBC Bank",
     },
   ];
+
+  async function handleApplyCode() {
+    const code = codeInput.trim();
+    if (!code) return;
+    setApplyingCode(true);
+    setCodeError(null);
+    try {
+      const res = await fetch("/api/discount/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code, subtotal }),
+      });
+      const data = await res.json();
+      if (res.ok && data.valid) {
+        setApplied({
+          code: data.code,
+          label: data.label,
+          discount: data.discount,
+        });
+        setCodeInput("");
+        toast.success(t.code_applied);
+      } else {
+        setApplied(null);
+        const msg = data.error || t.code_invalid;
+        setCodeError(msg);
+        toast.error(t.code_invalid);
+      }
+    } catch {
+      setApplied(null);
+      setCodeError(t.code_invalid);
+      toast.error(t.code_invalid);
+    } finally {
+      setApplyingCode(false);
+    }
+  }
+
+  function handleRemoveCode() {
+    setApplied(null);
+    setCodeError(null);
+  }
 
   const handleConfirm = async () => {
     if (!booking.paymentMethod) return;
@@ -85,6 +211,7 @@ export default function StepPayment({
           email: booking.email,
           players: booking.players,
           paymentMethod: booking.paymentMethod,
+          discountCode: applied?.code,
         }),
       });
 
@@ -105,6 +232,7 @@ export default function StepPayment({
           timeSlots: sortedSlots,
           players: booking.players,
           courtId: booking.courtId,
+          discountCode: applied?.code,
         }),
       });
 
@@ -118,7 +246,9 @@ export default function StepPayment({
       // 3. Redirect to payment page
       window.location.href = paymentUrl;
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
+      const msg = err instanceof Error ? err.message : "An error occurred";
+      setError(msg);
+      toast.error(msg);
       setLoading(false);
     }
   };
@@ -172,20 +302,148 @@ export default function StepPayment({
             </span>
           </div>
           <div className="flex justify-between items-center">
-            <span className="text-brand-gray text-sm">
-              {lang === "ka" ? "ფასი/საათი" : "Price/hour"}
-            </span>
-            <span className="text-brand-ink font-medium">{pricePerHour}₾</span>
-          </div>
-          <div className="flex justify-between items-center">
             <span className="text-brand-gray text-sm">{lang === "ka" ? "სახელი" : "Name"}</span>
             <span className="text-brand-ink font-medium">{booking.name}</span>
           </div>
-          <div className="border-t border-brand-line pt-3 mt-3 flex justify-between items-center">
-            <span className="text-brand-ink font-semibold">{t.book_total}</span>
-            <span className="text-2xl font-black text-primary-400">{total}₾</span>
+
+          {/* Per-slot breakdown */}
+          {breakdown.length > 0 && (
+            <div className="border-t border-brand-line pt-3 mt-1">
+              <div className="text-xs font-semibold uppercase tracking-wider text-brand-mute mb-2">
+                {t.price_breakdown}
+              </div>
+              <ul className="space-y-1 text-xs">
+                {breakdown
+                  .slice()
+                  .sort(
+                    (a, b) => orderIndex(a.time) - orderIndex(b.time)
+                  )
+                  .map((s) => (
+                    <li
+                      key={s.time}
+                      className="flex justify-between text-brand-gray"
+                    >
+                      <span>
+                        <span className="font-mono text-brand-ink">
+                          {s.time}
+                        </span>
+                        <span className="text-brand-mute">
+                          {" "}
+                          · {s.ruleLabel}
+                        </span>
+                      </span>
+                      <span className="text-brand-ink font-medium">
+                        {s.price}₾
+                      </span>
+                    </li>
+                  ))}
+              </ul>
+            </div>
+          )}
+
+          <div className="border-t border-brand-line pt-3 mt-3 space-y-2">
+            {applied ? (
+              <>
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-brand-gray">{t.subtotal}</span>
+                  <span className="text-brand-ink font-medium">{subtotal}₾</span>
+                </div>
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-primary-500 font-medium">
+                    {t.discount_label} ({applied.label})
+                  </span>
+                  <span className="text-primary-500 font-semibold">
+                    −{discount}₾
+                  </span>
+                </div>
+                <div className="flex justify-between items-center pt-2 border-t border-brand-line">
+                  <span className="text-brand-ink font-semibold">
+                    {t.book_total}
+                  </span>
+                  <span
+                    className={`text-2xl font-black text-primary-400 transition-opacity ${
+                      pricingLoading ? "opacity-60" : ""
+                    }`}
+                  >
+                    {total}₾
+                  </span>
+                </div>
+              </>
+            ) : (
+              <div className="flex justify-between items-center">
+                <span className="text-brand-ink font-semibold">
+                  {t.book_total}
+                </span>
+                <span
+                  className={`text-2xl font-black text-primary-400 transition-opacity ${
+                    pricingLoading ? "opacity-60" : ""
+                  }`}
+                >
+                  {total}₾
+                </span>
+              </div>
+            )}
           </div>
         </div>
+      </div>
+
+      {/* Discount code */}
+      <div>
+        <h3 className="text-brand-ink font-semibold text-sm mb-2">
+          {t.discount_code}
+        </h3>
+        {applied ? (
+          <div className="flex items-center justify-between bg-primary-50 border border-primary-200 rounded-xl px-4 py-3">
+            <div className="flex items-center gap-2 text-sm">
+              <span className="text-primary-500 font-bold">✓</span>
+              <span className="text-brand-ink font-medium">
+                {t.code_applied}:{" "}
+                <span className="font-mono">{applied.code}</span>
+              </span>
+              <span className="text-brand-gray">({applied.label})</span>
+            </div>
+            <button
+              type="button"
+              onClick={handleRemoveCode}
+              className="text-xs font-semibold text-brand-gray hover:text-red-500 transition-colors"
+            >
+              {t.remove_code}
+            </button>
+          </div>
+        ) : (
+          <>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={codeInput}
+                onChange={(e) => {
+                  setCodeInput(e.target.value.toUpperCase());
+                  if (codeError) setCodeError(null);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleApplyCode();
+                  }
+                }}
+                placeholder="FIRST10"
+                disabled={applyingCode}
+                className="flex-1 px-4 py-2.5 bg-white border border-brand-line focus:border-primary-400 focus:ring-2 focus:ring-primary-100 rounded-lg text-brand-ink placeholder:text-brand-mute font-mono outline-none transition-colors disabled:opacity-50"
+              />
+              <button
+                type="button"
+                onClick={handleApplyCode}
+                disabled={!codeInput.trim() || applyingCode || subtotal <= 0}
+                className="px-5 py-2.5 bg-primary-400 hover:bg-primary-500 disabled:bg-brand-line disabled:text-brand-mute disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-colors text-sm whitespace-nowrap"
+              >
+                {applyingCode ? "…" : t.apply_code}
+              </button>
+            </div>
+            {codeError && (
+              <p className="mt-1.5 text-xs text-red-600">{codeError}</p>
+            )}
+          </>
+        )}
       </div>
 
       {/* Payment method */}

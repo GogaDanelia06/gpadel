@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { format, isBefore, startOfDay, isToday } from "date-fns";
 import { Language, translations } from "@/types";
+import { Skeleton } from "@/components/ui/Skeleton";
 
 interface StepDateProps {
   lang: Language;
@@ -294,8 +295,10 @@ export default function StepDate({
           </div>
 
           {loadingSlots ? (
-            <div className="text-center py-8 text-brand-gray">
-              <div className="inline-block w-6 h-6 border-2 border-primary-400 border-t-transparent rounded-full animate-spin" />
+            <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-2">
+              {Array.from({ length: 17 }).map((_, i) => (
+                <Skeleton key={i} className="h-10 rounded-lg" />
+              ))}
             </div>
           ) : (
             <>

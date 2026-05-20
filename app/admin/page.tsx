@@ -7,9 +7,12 @@ import ReservationTable from "@/components/admin/ReservationTable";
 import WeekGrid from "@/components/admin/WeekGrid";
 import BlockForm from "@/components/admin/BlockForm";
 import Filters, { FilterState } from "@/components/admin/Filters";
+import PricingRules from "@/components/admin/PricingRules";
+import DiscountCodes from "@/components/admin/DiscountCodes";
+import { Skeleton } from "@/components/ui/Skeleton";
 import { Reservation } from "@/types";
 
-type Tab = "today" | "week" | "all" | "block";
+type Tab = "today" | "week" | "all" | "block" | "pricing" | "discounts";
 
 interface Stats {
   todayCount: number;
@@ -48,7 +51,9 @@ export default function AdminDashboardPage() {
   const [statsErr, setStatsErr] = useState<string | null>(null);
 
   const [todayList, setTodayList] = useState<Reservation[]>([]);
+  const [todayLoading, setTodayLoading] = useState(true);
   const [weekList, setWeekList] = useState<Reservation[]>([]);
+  const [weekLoading, setWeekLoading] = useState(true);
 
   // All Bookings tab state
   const [filters, setFilters] = useState<FilterState>({
@@ -93,23 +98,33 @@ export default function AdminDashboardPage() {
   }, []);
 
   const fetchToday = useCallback(async () => {
-    const res = await fetch(`/api/admin/reservations?date=${todayStr()}`, {
-      cache: "no-store",
-    });
-    if (res.ok) {
-      const data = (await res.json()) as { reservations: Reservation[] };
-      setTodayList(data.reservations);
+    setTodayLoading(true);
+    try {
+      const res = await fetch(`/api/admin/reservations?date=${todayStr()}`, {
+        cache: "no-store",
+      });
+      if (res.ok) {
+        const data = (await res.json()) as { reservations: Reservation[] };
+        setTodayList(data.reservations);
+      }
+    } finally {
+      setTodayLoading(false);
     }
   }, []);
 
   const fetchWeek = useCallback(async () => {
-    const res = await fetch(
-      `/api/admin/reservations?from=${weekStartStr}&to=${weekEndStr}`,
-      { cache: "no-store" }
-    );
-    if (res.ok) {
-      const data = (await res.json()) as { reservations: Reservation[] };
-      setWeekList(data.reservations);
+    setWeekLoading(true);
+    try {
+      const res = await fetch(
+        `/api/admin/reservations?from=${weekStartStr}&to=${weekEndStr}`,
+        { cache: "no-store" }
+      );
+      if (res.ok) {
+        const data = (await res.json()) as { reservations: Reservation[] };
+        setWeekList(data.reservations);
+      }
+    } finally {
+      setWeekLoading(false);
     }
   }, [weekStartStr, weekEndStr]);
 
@@ -166,6 +181,8 @@ export default function AdminDashboardPage() {
     { id: "week", label: "Week" },
     { id: "all", label: "All Bookings" },
     { id: "block", label: "Block Time" },
+    { id: "pricing", label: "Pricing" },
+    { id: "discounts", label: "Discount Codes" },
   ];
 
   return (
@@ -179,6 +196,7 @@ export default function AdminDashboardPage() {
             label="Today's bookings"
             value={stats?.todayCount ?? "—"}
             hint="Today"
+            loading={stats === null && !statsErr}
             icon={
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -189,6 +207,7 @@ export default function AdminDashboardPage() {
             label="This week"
             value={stats?.weekCount ?? "—"}
             hint="Week"
+            loading={stats === null && !statsErr}
             icon={
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12h18M3 6h18M3 18h18" />
@@ -199,6 +218,7 @@ export default function AdminDashboardPage() {
             label="Today's revenue"
             value={`${stats?.todayRevenue ?? 0}₾`}
             hint="Paid"
+            loading={stats === null && !statsErr}
             icon={
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8v8m0 0v2m0-10V6m9 6a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -209,6 +229,7 @@ export default function AdminDashboardPage() {
             label="Pending payments"
             value={stats?.pendingCount ?? "—"}
             hint="Pending"
+            loading={stats === null && !statsErr}
             icon={
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -246,17 +267,39 @@ export default function AdminDashboardPage() {
 
         {/* Tab content */}
         {tab === "today" && (
-          <ReservationTable
-            reservations={todayList}
-            onChange={refreshAll}
-            emptyHint="No bookings today."
-          />
+          todayLoading ? (
+            <div className="bg-white border border-brand-line rounded-2xl p-4 space-y-3">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="flex items-center gap-4 py-2"
+                  aria-hidden="true"
+                >
+                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-4 w-20" />
+                  <Skeleton className="h-4 w-16" />
+                  <Skeleton className="h-4 flex-1 max-w-[160px]" />
+                  <Skeleton className="h-4 w-24 hidden sm:block" />
+                  <Skeleton className="h-4 w-10" />
+                  <Skeleton className="h-4 w-14" />
+                  <Skeleton className="h-5 w-16 rounded-full" />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <ReservationTable
+              reservations={todayList}
+              onChange={refreshAll}
+              emptyHint="No bookings today."
+            />
+          )
         )}
 
         {tab === "week" && (
           <WeekGrid
             reservations={weekList}
             weekStart={weekStart}
+            loading={weekLoading}
             onEmptyClick={(date, slot, courtId) => {
               setPrefillSlot({ date, start: slot, courtId });
               setTab("block");
@@ -268,7 +311,24 @@ export default function AdminDashboardPage() {
           <div className="space-y-4">
             <Filters value={filters} onChange={setFilters} onExport={exportCsv} />
             {allLoading ? (
-              <div className="text-center py-10 text-brand-gray">Loading…</div>
+              <div className="bg-white border border-brand-line rounded-2xl p-4 space-y-3">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center gap-4 py-2"
+                    aria-hidden="true"
+                  >
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-4 w-20" />
+                    <Skeleton className="h-4 w-16" />
+                    <Skeleton className="h-4 flex-1 max-w-[160px]" />
+                    <Skeleton className="h-4 w-24 hidden sm:block" />
+                    <Skeleton className="h-4 w-10" />
+                    <Skeleton className="h-4 w-14" />
+                    <Skeleton className="h-5 w-16 rounded-full" />
+                  </div>
+                ))}
+              </div>
             ) : (
               <ReservationTable
                 reservations={allList}
@@ -297,6 +357,10 @@ export default function AdminDashboardPage() {
             />
           </div>
         )}
+
+        {tab === "pricing" && <PricingRules />}
+
+        {tab === "discounts" && <DiscountCodes />}
       </main>
     </div>
   );

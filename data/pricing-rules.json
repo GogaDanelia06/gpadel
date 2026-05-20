@@ -1,0 +1,61 @@
+[
+  {
+    "id": "1",
+    "label": "Off-peak weekday",
+    "days": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "startHour": 9,
+    "endHour": 17,
+    "pricePerHour": 40,
+    "fourPlayerMultiplier": 2
+  },
+  {
+    "id": "2",
+    "label": "Weekday evening",
+    "days": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "startHour": 17,
+    "endHour": 22,
+    "pricePerHour": 60,
+    "fourPlayerMultiplier": 2
+  },
+  {
+    "id": "3",
+    "label": "Weekend",
+    "days": [
+      6,
+      7
+    ],
+    "startHour": 9,
+    "endHour": 22,
+    "pricePerHour": 80,
+    "fourPlayerMultiplier": 2
+  },
+  {
+    "id": "4",
+    "label": "Late night",
+    "days": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "startHour": 22,
+    "endHour": 26,
+    "pricePerHour": 50,
+    "fourPlayerMultiplier": 2
+  }
+]

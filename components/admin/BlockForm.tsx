@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { useToast } from "@/components/ui/ToastProvider";
 
 interface BlockFormProps {
   initialCourtId?: 1 | 2;
@@ -41,6 +42,7 @@ export default function BlockForm({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [ok, setOk] = useState(false);
+  const toast = useToast();
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -63,15 +65,19 @@ export default function BlockForm({
       });
       if (!res.ok) {
         const data = (await res.json().catch(() => ({}))) as { error?: string };
-        setError(data.error || "Failed to block");
+        const msg = data.error || "Failed to block";
+        setError(msg);
+        toast.error(msg);
         setSubmitting(false);
         return;
       }
       setOk(true);
       setReason("");
+      toast.success("Slot blocked");
       onCreated?.();
     } catch {
       setError("Network error");
+      toast.error("Network error");
     } finally {
       setSubmitting(false);
     }
