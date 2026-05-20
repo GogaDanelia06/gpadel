@@ -93,7 +93,11 @@ export default function Footer({ lang }: FooterProps) {
         {/* Bottom bar */}
         <div className="mt-10 pt-6 border-t border-brand-line flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-brand-mute text-sm">{t.footer_rights}</p>
-          <Link
+          {/* Plain anchor (not Next.js <Link>) so middleware redirect works on
+              first click without needing a refresh. <Link> prefetches /admin
+              which middleware redirects to /admin/login — the prefetched result
+              gets cached and the click becomes a no-op. */}
+          <a
             href="/admin"
             className="inline-flex items-center gap-1.5 text-brand-mute hover:text-primary-400 text-xs transition-colors"
           >
@@ -101,7 +105,7 @@ export default function Footer({ lang }: FooterProps) {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
             </svg>
             {lang === "ka" ? "ადმინი" : "Admin"}
-          </Link>
+          </a>
         </div>
       </div>
     </footer>
