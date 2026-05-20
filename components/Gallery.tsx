@@ -7,39 +7,16 @@ interface GalleryProps {
   lang: Language;
 }
 
+// Real GPadel Tskneti photos sourced from the adidaspadel.ge product listing
 const PHOTOS: { src: string; alt: string }[] = [
-  {
-    src: "https://images.unsplash.com/photo-1554068865-24cecd4e34b8?w=1200&q=80",
-    alt: "Padel court overview",
-  },
-  {
-    src: "https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=1200&q=80",
-    alt: "Indoor padel arena",
-  },
-  {
-    src: "https://images.unsplash.com/photo-1592656094267-764a45160876?w=1200&q=80",
-    alt: "Player serving on court",
-  },
-  {
-    src: "https://images.unsplash.com/photo-1622279457486-62dcc4a431d6?w=1200&q=80",
-    alt: "Court at golden hour",
-  },
-  {
-    src: "https://images.unsplash.com/photo-1559586980-7bb4eea0fc78?w=1200&q=80",
-    alt: "Tennis racquet on court",
-  },
-  {
-    src: "https://images.unsplash.com/photo-1531315396756-905d68d21b56?w=1200&q=80",
-    alt: "Sport facility view",
-  },
-  {
-    src: "https://images.unsplash.com/photo-1554068865-24cecd4e34b8?w=1200&q=80&flip=1",
-    alt: "Padel match in progress",
-  },
-  {
-    src: "https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=1200&q=80&flip=1",
-    alt: "Net detail",
-  },
+  { src: "https://www.adidaspadel.ge/files/products/19szCVf26DpuuvWo9szwFmgPjNHTNB.jpg", alt: "GPadel Tskneti court 1" },
+  { src: "https://www.adidaspadel.ge/files/products/52Ert77pF4pMFiDSPlXRIqoC7Xk1GP.jpg", alt: "GPadel Tskneti court 2" },
+  { src: "https://www.adidaspadel.ge/files/products/Nbi5jj82RL4ZGCwTGofM1tqdsSseXa.jpg", alt: "GPadel Tskneti court 3" },
+  { src: "https://www.adidaspadel.ge/files/products/QnqzU6Qwqv8rudr5xBKHKqc6Z5ZT2W.jpg", alt: "GPadel Tskneti court 4" },
+  { src: "https://www.adidaspadel.ge/files/products/R9JuggYkW79yoQXO2XGD2Zq6jqX5G2.jpg", alt: "GPadel Tskneti court 5" },
+  { src: "https://www.adidaspadel.ge/files/products/dM44r04K3xl3OSy2XG2zOeC4lBYhIo.jpg", alt: "GPadel Tskneti court 6" },
+  { src: "https://www.adidaspadel.ge/files/products/eBOLZoNh23aoLgF3JfjCvFtLTcr6Ng.jpg", alt: "GPadel Tskneti court 7" },
+  { src: "https://www.adidaspadel.ge/files/products/sRnOewDBrj9tYJZfS98aaRcRO2PTu6.jpg", alt: "GPadel Tskneti court 8" },
 ];
 
 export default function Gallery({ lang }: GalleryProps) {
