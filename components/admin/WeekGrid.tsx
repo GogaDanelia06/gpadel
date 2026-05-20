@@ -68,7 +68,7 @@ function CourtGrid({
       <div className="flex items-center justify-between mb-3">
         <h3 className="font-bold text-brand-ink">Court {courtId}</h3>
         <span className="text-xs text-brand-mute">
-          {courtId === 1 ? "Outdoor" : "Indoor"}
+          {courtId === 1 ? "Outdoor" : "Panorama"}
         </span>
       </div>
       <div className="overflow-x-auto">

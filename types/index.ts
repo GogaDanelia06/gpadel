@@ -289,7 +289,7 @@ export const translations: Record<Language, Translation> = {
     court_1: "Court 1",
     court_2: "Court 2",
     court_1_desc: "Outdoor Court",
-    court_2_desc: "Indoor Court",
+    court_2_desc: "Panorama Court",
   },
 };
 

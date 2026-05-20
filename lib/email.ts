@@ -186,7 +186,7 @@ export async function sendBookingConfirmation(
     ? [...args.timeSlots].sort((a, b) => orderIndex(a) - orderIndex(b))[0]
     : "";
   const courtLabel =
-    args.courtId === 1 ? "Court 1 (Outdoor)" : "Court 2 (Indoor)";
+    args.courtId === 1 ? "Court 1 (Outdoor)" : "Court 2 (Panorama)";
 
   const html = buildEmailHTML({ ...args, timeRange, courtLabel });
 

@@ -21,7 +21,7 @@ export default function Courts({ lang }: CourtsProps) {
       name: t.court2_name,
       desc: t.court2_desc,
       accent: "bg-brand-blue",
-      badge: lang === "ka" ? "შიდა" : "Indoor",
+      badge: lang === "ka" ? "შიდა" : "Panorama",
     },
   ];
 

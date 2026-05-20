@@ -95,7 +95,7 @@ export default function BlockForm({
             className="w-full px-3 py-2 bg-white border border-brand-line rounded-lg text-sm text-brand-ink outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-100"
           >
             <option value={1}>Court 1 (Outdoor)</option>
-            <option value={2}>Court 2 (Indoor)</option>
+            <option value={2}>Court 2 (Panorama)</option>
           </select>
         </div>
         <div>
