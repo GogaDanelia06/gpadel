@@ -24,6 +24,7 @@ export async function GET(request: NextRequest) {
   if (!date) {
     return NextResponse.json({ error: "date param required" }, { status: 400 });
   }
+
   if (!courtId) {
     return NextResponse.json(
       { error: "courtId param required (1 or 2)" },
@@ -39,6 +40,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+
     const {
       date,
       timeSlots,
@@ -46,7 +48,6 @@ export async function POST(request: NextRequest) {
       name,
       phone,
       email,
-      players,
       paymentMethod,
       discountCode,
     } = body as {
@@ -56,7 +57,6 @@ export async function POST(request: NextRequest) {
       name?: string;
       phone?: string;
       email?: string;
-      players?: 2 | 4;
       paymentMethod?: "bog" | "tbc";
       discountCode?: string;
     };
@@ -67,7 +67,6 @@ export async function POST(request: NextRequest) {
       !name ||
       !phone ||
       !email ||
-      !players ||
       !paymentMethod
     ) {
       return NextResponse.json(
@@ -101,9 +100,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Conflict check — reject if any requested slot is already booked on THIS court
+    const players = 4 as const;
+
     const alreadyBooked = getBookedSlotsForDate(date, courtId);
     const conflicts = timeSlots.filter((s) => alreadyBooked.includes(s));
+
     if (conflicts.length > 0) {
       return NextResponse.json(
         {
@@ -114,14 +115,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Rule-based pricing
     const { subtotal } = await calculateBookingPrice(date, timeSlots, players);
 
-    // Optional discount
     let appliedCode: string | undefined;
     let finalPrice = subtotal;
+
     if (typeof discountCode === "string" && discountCode.trim().length > 0) {
       const found = await findCode(discountCode);
+
       if (isValidCode(found)) {
         const { total } = applyDiscount(subtotal, found);
         finalPrice = total;
