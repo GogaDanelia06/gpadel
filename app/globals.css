@@ -4,9 +4,8 @@
 
 :root {
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --brand-green: #61CE70;
-  --brand-green-dark: #4FB45E;
-  --brand-blue: #6EC1E4;
+  --brand-blue: #2196F3;
+  --brand-blue-dark: #1E88E5;
   --brand-ink: #54595F;
   --brand-gray: #7A7A7A;
   --brand-line: #E5E5E9;
@@ -36,7 +35,7 @@ body {
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--brand-green);
+  background: var(--brand-blue);
 }
 
 /* Radial gradient utility */
