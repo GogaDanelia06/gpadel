@@ -64,7 +64,6 @@ export interface Translation {
   book_your_phone: string;
   book_your_email: string;
   book_players: string;
-  book_players_2: string;
   book_players_4: string;
   book_payment_method: string;
   book_bog: string;
@@ -176,7 +175,6 @@ export const translations: Record<Language, Translation> = {
     book_your_phone: "ტელეფონი",
     book_your_email: "ელ-ფოსტა",
     book_players: "მოთამაშეთა რაოდენობა",
-    book_players_2: "2 მოთამაშე — 40₾",
     book_players_4: "4 მოთამაშე — 80₾",
     book_payment_method: "გადახდის მეთოდი",
     book_bog: "BOG Pay (საქართველოს ბანკი)",
@@ -283,7 +281,6 @@ export const translations: Record<Language, Translation> = {
     book_your_phone: "Phone",
     book_your_email: "Email",
     book_players: "Number of Players",
-    book_players_2: "2 Players — 40₾",
     book_players_4: "4 Players — 80₾",
     book_payment_method: "Payment Method",
     book_bog: "BOG Pay (Bank of Georgia)",
@@ -339,7 +336,7 @@ export interface Reservation {
   name: string;
   phone: string;
   email: string;
-  players: 2 | 4;
+  players: 4;
   price: number;
   paymentMethod: "bog" | "tbc";
   paymentStatus: "pending" | "paid" | "failed";
@@ -388,6 +385,6 @@ export interface BookingState {
   name: string;
   phone: string;
   email: string;
-  players: 2 | 4;
+  players: 4;
   paymentMethod: "bog" | "tbc";
 }

@@ -6,7 +6,7 @@ interface SendBookingConfirmationArgs {
   date: string;
   timeSlots: string[];
   courtId: 1 | 2;
-  players: 2 | 4;
+  players: 4;
   total: number;
   reservationId: string;
 }

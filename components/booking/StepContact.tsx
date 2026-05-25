@@ -11,7 +11,7 @@ interface StepContactProps {
   name: string;
   phone: string;
   email: string;
-  players: 2 | 4;
+  players: 4;
   onNameChange: (v: string) => void;
   onPhoneChange: (v: string) => void;
   onEmailChange: (v: string) => void;
@@ -242,34 +242,25 @@ export default function StepContact({
       </div>
 
       {/* Players */}
-      <div>
-        <label className="block text-brand-ink text-sm font-medium mb-3">
-          {t.book_players} <span className="text-primary-400">*</span>
-        </label>
-        <div className="grid grid-cols-2 gap-3">
-          {([2, 4] as const).map((n) => {
-            const label = n === 2 ? t.book_players_2 : t.book_players_4;
-            const sel = players === n;
-            return (
-              <button
-                key={n}
-                type="button"
-                onClick={() => onPlayersChange(n)}
-                className={`
-                  flex flex-col items-center justify-center gap-1 py-5 px-4 rounded-xl border-2 transition-all font-medium
-                  ${sel
-                    ? "border-primary-400 bg-primary-50 text-brand-ink"
-                    : "border-brand-line bg-white text-brand-gray hover:border-brand-mute hover:text-brand-ink"
-                  }
-                `}
-              >
-                <span className="text-2xl">{n === 2 ? "👥" : "👥👥"}</span>
-                <span className="text-sm">{label}</span>
-              </button>
-            );
-          })}
+{/* Players */}
+<div>
+  <label className="block text-brand-ink text-sm font-medium mb-3">
+    {t.book_players} <span className="text-primary-400">*</span>
+  </label>
+
+  <button
+    type="button"
+    onClick={() => onPlayersChange(4)}
+    className="
+      w-full flex flex-col items-center justify-center gap-1 py-5 px-4
+      rounded-xl border-2 border-primary-400 bg-primary-50
+      text-brand-ink transition-all font-medium
+    "
+  >
+    <span className="text-2xl">👥👥</span>
+    <span className="text-sm">{t.book_players_4}</span>
+  </button>
         </div>
-      </div>
 
       {/* Buttons */}
       <div className="flex justify-between pt-4">
@@ -287,6 +278,7 @@ export default function StepContact({
           {t.book_next} →
         </button>
       </div>
-    </div>
+      </div>
+
   );
 }

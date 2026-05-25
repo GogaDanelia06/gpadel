@@ -58,34 +58,31 @@ export async function writePricingRules(rules: PricingRule[]): Promise<void> {
   await fs.writeFile(FILE, JSON.stringify(rules, null, 2));
 }
 
-// dayOfWeek: 1=Monday ... 7=Sunday
 export function priceForSlot(
   rules: PricingRule[],
-  date: string, // YYYY-MM-DD
-  timeSlot: string, // HH:00
-  players: 2 | 4
+  date: string,
+  timeSlot: string,
+  players: 4
 ): { price: number; ruleLabel: string } {
   const d = new Date(date + "T00:00:00");
-  const jsDay = d.getDay(); // 0=Sun, 1=Mon ... 6=Sat
+  const jsDay = d.getDay();
   const dayOfWeek = jsDay === 0 ? 7 : jsDay;
   const hour = parseInt(timeSlot.split(":")[0], 10);
-  // Slots that fall before 09:00 are treated as a continuation of the previous
-  // evening (so 00:00 is hour 24, 01:00 is hour 25, …) so a "Late night" rule
-  // spanning [22, 26) covers them.
   const effectiveHour = hour < 9 ? hour + 24 : hour;
 
   for (const rule of rules) {
     if (!rule.days.includes(dayOfWeek)) continue;
+
     if (effectiveHour >= rule.startHour && effectiveHour < rule.endHour) {
-      const base = rule.pricePerHour;
-      const multiplier = players === 4 ? rule.fourPlayerMultiplier : 1;
-      return { price: base * multiplier, ruleLabel: rule.label };
+      return {
+        price: rule.pricePerHour * rule.fourPlayerMultiplier,
+        ruleLabel: rule.label,
+      };
     }
   }
 
-  // Fallback when no rule matches
   return {
-    price: players === 4 ? 120 : 60,
+    price: 120,
     ruleLabel: "Standard",
   };
 }
@@ -93,16 +90,19 @@ export function priceForSlot(
 export async function calculateBookingPrice(
   date: string,
   timeSlots: string[],
-  players: 2 | 4
+  players: 4
 ): Promise<{
   subtotal: number;
   breakdown: Array<{ time: string; price: number; ruleLabel: string }>;
 }> {
   const rules = await readPricingRules();
+
   const breakdown = timeSlots.map((time) => {
     const { price, ruleLabel } = priceForSlot(rules, date, time, players);
     return { time, price, ruleLabel };
   });
+
   const subtotal = breakdown.reduce((sum, b) => sum + b.price, 0);
+
   return { subtotal, breakdown };
 }
