@@ -12,20 +12,15 @@ import { findReservationById, updateReservation } from "@/lib/reservations";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const {
-      reservationId,
-      timeSlots,
-      players,
-      courtId,
-      discountCode,
-    } = body as {
+
+    const { reservationId, timeSlots, courtId, discountCode } = body as {
       reservationId?: string;
-      amount?: number; // ignored; kept for backward compat
+      amount?: number;
       timeSlots?: unknown;
-      players?: 2 | 4;
       courtId?: 1 | 2;
       discountCode?: string;
     };
+
     void courtId;
 
     if (!reservationId) {
@@ -36,6 +31,7 @@ export async function POST(request: NextRequest) {
     }
 
     const reservation = findReservationById(reservationId);
+
     if (!reservation) {
       return NextResponse.json(
         { error: "reservation not found" },
@@ -51,9 +47,8 @@ export async function POST(request: NextRequest) {
       )
         ? (timeSlots as string[])
         : reservation.timeSlots;
-    const usedPlayers: 2 | 4 = players === 2 || players === 4
-      ? players
-      : reservation.players;
+
+    const usedPlayers = 4 as const;
 
     if (usedSlots.length < 1 || usedSlots.length > 8) {
       return NextResponse.json(
@@ -75,8 +70,10 @@ export async function POST(request: NextRequest) {
 
     let appliedCode: string | undefined;
     let finalAmount = subtotal;
+
     if (codeInput) {
       const found = await findCode(codeInput);
+
       if (isValidCode(found)) {
         const { total } = applyDiscount(subtotal, found);
         finalAmount = total;
@@ -92,6 +89,7 @@ export async function POST(request: NextRequest) {
     }
 
     updateReservation(reservationId, {
+      players: 4,
       price: finalAmount,
       originalPrice: subtotal,
       discountCode: appliedCode,
@@ -114,8 +112,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ paymentUrl, orderId });
   } catch (error) {
     console.error("TBC payment error:", error);
+
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Payment initiation failed" },
+      {
+        error:
+          error instanceof Error
+            ? error.message
+            : "Payment initiation failed",
+      },
       { status: 500 }
     );
   }
