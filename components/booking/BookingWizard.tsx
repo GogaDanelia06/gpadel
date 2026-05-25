@@ -21,7 +21,7 @@ export default function BookingWizard({ lang }: BookingWizardProps) {
     name: "",
     phone: "",
     email: "",
-    players: 2,
+    players: 4,
     paymentMethod: "bog",
   });
 
