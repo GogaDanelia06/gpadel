@@ -15,7 +15,7 @@ interface StepContactProps {
   onNameChange: (v: string) => void;
   onPhoneChange: (v: string) => void;
   onEmailChange: (v: string) => void;
-  onPlayersChange: (v: 2 | 4) => void;
+  onPlayersChange: (v: 4) => void;
   onNext: () => void;
   onBack: () => void;
 }

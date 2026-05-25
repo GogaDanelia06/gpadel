@@ -115,7 +115,7 @@ export default function BookingWizard({ lang }: BookingWizardProps) {
             onNameChange={(v) => setBooking((b) => ({ ...b, name: v }))}
             onPhoneChange={(v) => setBooking((b) => ({ ...b, phone: v }))}
             onEmailChange={(v) => setBooking((b) => ({ ...b, email: v }))}
-            onPlayersChange={(v) => setBooking((b) => ({ ...b, players: v }))}
+            onPlayersChange={() => setBooking((b) => ({ ...b, players: 4 }))}
             onNext={goNext}
             onBack={goBack}
           />
