@@ -95,14 +95,16 @@ export async function calculateBookingPrice(
   subtotal: number;
   breakdown: Array<{ time: string; price: number; ruleLabel: string }>;
 }> {
-  const rules = await readPricingRules();
+  void date;
+  void players;
 
-  const breakdown = timeSlots.map((time) => {
-    const { price, ruleLabel } = priceForSlot(rules, date, time, players);
-    return { time, price, ruleLabel };
-  });
+  const breakdown = timeSlots.map((time) => ({
+    time,
+    price: 80,
+    ruleLabel: "Fixed 4-player price",
+  }));
 
-  const subtotal = breakdown.reduce((sum, b) => sum + b.price, 0);
+  const subtotal = timeSlots.length * 80;
 
   return { subtotal, breakdown };
 }
